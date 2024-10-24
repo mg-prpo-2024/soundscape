@@ -18,13 +18,16 @@ jobs:
     name: ⬣ Lint
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./metadata-service
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
@@ -46,12 +49,16 @@ jobs:
   typecheck:
     name: ⬣ Typecheck
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./metadata-service
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
@@ -63,9 +70,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        working-directory: ./metadata-service
         run: pnpm install
 
       - name: Run typecheck
-        working-directory: ./metadata-service
         run: pnpm typecheck
