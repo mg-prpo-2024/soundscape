@@ -37,13 +37,12 @@ jobs:
         with:
           node-version: 22
           cache: "pnpm"
+          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
 
       - name: Install dependencies
-        working-directory: ./metadata-service
         run: pnpm install
 
       - name: Run lint
-        working-directory: ./metadata-service
         run: pnpm lint
 
   typecheck:
