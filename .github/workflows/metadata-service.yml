@@ -15,7 +15,8 @@ concurrency:
 
 jobs:
   lint:
-    name: ⬣ Lint metadata-service
+    name: ⬣ Lint
+
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +38,7 @@ jobs:
       - name: Run ESLint
         run: pnpm lint
   typecheck:
-    name: ⬣ Typecheck metadata-service
+    name: ⬣ Typecheck
     runs-on: ubuntu-latest
 
     steps:
