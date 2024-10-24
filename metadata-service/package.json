@@ -1,12 +1,17 @@
 {
   "name": "metadata",
   "type": "module",
+  "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228",
+  "engines": {
+    "node": ">=22.0.0 <23.0.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
+    "test": "cross-env NODE_ENV=test vitest",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -14,12 +19,15 @@
     "hono": "^4.6.6"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^3.8.0",
     "@types/node": "^20.11.17",
+    "cross-env": "^7.0.3",
     "eslint": "^9.13.0",
+    "eslint-plugin-format": "^0.1.2",
     "prettier": "^3.3.3",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.7.1",
-    "typescript": "^5.6.3"
-  },
-  "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
 }

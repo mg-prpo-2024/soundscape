@@ -1,0 +1,106 @@
+name: ⬣ Metadata Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - metadata-service/**
+      - .github/workflows/metadata-service.yml
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: ⬣ Lint
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./metadata-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run lint
+        run: pnpm lint
+
+  typecheck:
+    name: ⬣ Typecheck
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./metadata-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run typecheck
+        run: pnpm typecheck
+
+  test:
+    name: ⬣ Vitest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./metadata-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run typecheck
+        run: pnpm test

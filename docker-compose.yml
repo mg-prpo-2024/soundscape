@@ -34,6 +34,20 @@ services:
     ports:
       - "8000:8000" # Kong proxy
       - "8001:8001" # Kong admin
+  # konga:
+  #   image: pantsel/konga:latest
+  #   container_name: konga
+  #   depends_on:
+  #     - kong
+  #   ports:
+  #     - "1337:1337" # Expose Konga on port 1337
+  #   environment:
+  #     - NODE_ENV=production
+  #   links:
+  #     - kong
+  #   volumes:
+  #     - konga-data:/app/konga
 
 volumes:
   kong-db-data:
+  konga-data:
