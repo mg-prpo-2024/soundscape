@@ -36,9 +36,11 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: cd metadata-service && pnpm install
+        working-directory: ./metadata-service
+        run: pnpm install
 
       - name: Run lint
+        working-directory: ./metadata-service
         run: pnpm lint
 
   typecheck:
@@ -61,7 +63,9 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: cd metadata-service && pnpm install
+        working-directory: ./metadata-service
+        run: pnpm install
 
       - name: Run typecheck
+        working-directory: ./metadata-service
         run: pnpm typecheck
