@@ -1,0 +1,14 @@
+_format_version: "3.0"
+services:
+  - name: metadata-service
+    url: http://metadata-service:3000
+    routes:
+      - name: metadata-service
+        paths:
+          - /metadata
+  # - name: service2
+  #   url: http://service2:3002
+  #   routes:
+  #     - name: service2-route
+  #       paths:
+  #         - /service2

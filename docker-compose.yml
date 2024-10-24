@@ -1,0 +1,39 @@
+services:
+  metadata-service:
+    build: ./metadata-service
+    container_name: metadata-service
+    ports:
+      - "3001:3000" # Expose service on port 3001
+    environment:
+      - NODE_ENV=development
+
+  # users-service:
+  #   build: ./users-service
+  #   container_name: users-service
+  #   ports:
+  #     - "3002:3002" # Expose service on port 3002
+  #   environment:
+  #     - NODE_ENV=development
+
+  # Kong API Gateway in DB-less mode
+  kong:
+    image: kong:latest
+    container_name: kong
+    depends_on:
+      - metadata-service
+    environment:
+      - KONG_DATABASE=off # DB-less mode
+      - KONG_DECLARATIVE_CONFIG=/config/kong.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    volumes:
+      - ./config/kong.yml:/config/kong.yml # Mount the declarative config file
+    ports:
+      - "8000:8000" # Kong proxy
+      - "8001:8001" # Kong admin
+
+volumes:
+  kong-db-data:
