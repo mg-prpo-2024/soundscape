@@ -14,6 +14,13 @@ services:
   #     - "3002:3002" # Expose service on port 3002
   #   environment:
   #     - NODE_ENV=development
+  s3:
+    image: localstack/localstack
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566" # LocalStack port for all services
 
   # Kong API Gateway in DB-less mode
   kong:
