@@ -5,24 +5,27 @@ import { createMessageObjectSchema } from "stoker/openapi/schemas";
 
 import { createRouter } from "@/lib/create-app";
 
-const router = createRouter()
-  .openapi(
-    createRoute({
-      tags: ["Index"],
-      method: "get",
-      path: "/",
-      responses: {
-        [HttpStatusCodes.OK]: jsonContent(
-          createMessageObjectSchema("Music Metadata API"),
-          "Music Metadata API Index",
-        ),
-      },
-    }),
-    (c) => {
-      return c.json({
-        message: "Music Metadata API",
-      }, HttpStatusCodes.OK);
+const router = createRouter().openapi(
+  createRoute({
+    tags: ["Index"],
+    method: "get",
+    path: "/",
+    summary: "Music Metadata API Index",
+    responses: {
+      [HttpStatusCodes.OK]: jsonContent(
+        createMessageObjectSchema("Music Metadata API"),
+        "Music Metadata API Index",
+      ),
     },
-  );
+  }),
+  (c) => {
+    return c.json(
+      {
+        message: "Music Metadata API",
+      },
+      HttpStatusCodes.OK,
+    );
+  },
+);
 
 export default router;

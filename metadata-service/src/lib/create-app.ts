@@ -27,10 +27,9 @@ export default function createApp() {
   const app = createRouter();
 
   app.get("/health", (c) => {
-    // TODO: proper health check
     return c.text("OK");
   });
-  // TODO: cors
+  // TODO: cors?
   app.use("*", registerMetrics);
   app.get("/metrics", printMetrics);
   app.use(trimTrailingSlash());
@@ -44,7 +43,7 @@ export default function createApp() {
 
   app.notFound(notFound);
   app.onError(onError);
-  // TODO: graceful shutdown
+
   return app;
 }
 
