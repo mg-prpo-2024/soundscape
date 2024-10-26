@@ -1,6 +1,7 @@
 {
   "name": "metadata",
   "type": "module",
+  "version": "1.0.0",
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228",
   "engines": {
     "node": ">=22.0.0 <23.0.0"
@@ -16,17 +17,32 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.13.2",
-    "hono": "^4.6.6"
+    "@hono/prometheus": "^1.0.1",
+    "@hono/zod-openapi": "^0.16.4",
+    "@scalar/hono-api-reference": "^0.5.156",
+    "dotenv": "^16.4.5",
+    "dotenv-expand": "^11.0.6",
+    "drizzle-orm": "^0.35.3",
+    "hono": "^4.6.6",
+    "hono-pino": "^0.4.0",
+    "pg": "^8.13.1",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0",
+    "prom-client": "^15.1.3",
+    "stoker": "^1.2.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
     "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.10",
     "cross-env": "^7.0.3",
+    "drizzle-kit": "^0.26.2",
     "eslint": "^9.13.0",
     "eslint-plugin-format": "^0.1.2",
     "prettier": "^3.3.3",
     "tsc-alias": "^1.8.10",
-    "tsx": "^4.7.1",
+    "tsx": "^4.19.1",
     "typescript": "^5.6.3",
     "vitest": "^2.1.3"
   }
