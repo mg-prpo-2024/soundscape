@@ -78,6 +78,11 @@ jobs:
   test:
     name: ⬣ Vitest
     runs-on: ubuntu-latest
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
     defaults:
       run:
         working-directory: ./metadata-service
@@ -103,4 +108,12 @@ jobs:
         run: pnpm install
 
       - name: Run typecheck
-        run: pnpm test
+        run: pnpm test-ci
+
+      - name: "Report Coverage"
+        with:
+          working-directory: ./metadata-service
+        # Set if: always() to also generate the report if tests are failing
+        # Only works if you set `reportOnFailure: true` in your vite config as specified above
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2

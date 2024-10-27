@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "cross-env NODE_ENV=test vitest",
+    "test-ci": "cross-env NODE_ENV=test vitest --coverage.enabled true",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -36,6 +37,7 @@
     "@antfu/eslint-config": "^3.8.0",
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.10",
+    "@vitest/coverage-v8": "2.1.3",
     "cross-env": "^7.0.3",
     "drizzle-kit": "^0.26.2",
     "eslint": "^9.13.0",
