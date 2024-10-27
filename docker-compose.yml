@@ -1,19 +1,30 @@
 services:
   metadata-service:
-    build: ./metadata-service
+    build:
+      context: ./metadata-service
+      target: development
     container_name: metadata-service
     ports:
       - "3001:3000" # Expose service on port 3001
+    volumes:
+      - ./metadata-service:/app # Mount current directory for hot reloading
+      - /app/node_modules
     environment:
       - NODE_ENV=development
 
-  # users-service:
-  #   build: ./users-service
-  #   container_name: users-service
-  #   ports:
-  #     - "3002:3002" # Expose service on port 3002
-  #   environment:
-  #     - NODE_ENV=development
+  users-service:
+    build:
+      context: ./users-service
+      target: development
+    container_name: users-service
+    ports:
+      - "3002:3000" # Expose service on port 3001
+    volumes:
+      - ./users-service:/app # Mount current directory for hot reloading
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+
   s3:
     image: localstack/localstack
     environment:

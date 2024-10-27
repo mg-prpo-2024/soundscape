@@ -1,12 +1,12 @@
-name: ⬣ Metadata Service
+name: ⬣ Users Service
 
 on:
   push:
     branches:
       - main
     paths:
-      - "metadata-service/**"
-      - ".github/workflows/metadata-service.yml"
+      - "users-service/**"
+      - ".github/workflows/users-service.yml"
   pull_request:
 
 concurrency:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./metadata-service
+        working-directory: ./users-service
 
     steps:
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: 22
           cache: "pnpm"
-          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+          cache-dependency-path: "./users-service/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./metadata-service
+        working-directory: ./users-service
 
     steps:
       - name: Checkout
@@ -66,7 +66,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+          cache-dependency-path: "./users-service/pnpm-lock.yaml"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -79,13 +79,12 @@ jobs:
     name: ⬣ Vitest
     runs-on: ubuntu-latest
     permissions:
-      # Required to checkout the code
       contents: read
       # Required to put a comment into the pull-request
       pull-requests: write
     defaults:
       run:
-        working-directory: ./metadata-service
+        working-directory: ./users-service
 
     steps:
       - name: Checkout
@@ -101,7 +100,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache-dependency-path: "./metadata-service/pnpm-lock.yaml"
+          cache-dependency-path: "./users-service/pnpm-lock.yaml"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -112,7 +111,7 @@ jobs:
 
       - name: "Report Coverage"
         with:
-          working-directory: ./metadata-service
+          working-directory: ./users-service
         # Set if: always() to also generate the report if tests are failing
         # Only works if you set `reportOnFailure: true` in your vite config as specified above
         if: always()
