@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - users-service/**
-      - .github/workflows/users-service.yml
+      - "users-service/**"
+      - ".github/workflows/users-service.yml"
   pull_request:
 
 concurrency:

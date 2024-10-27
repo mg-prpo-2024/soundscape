@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - metadata-service/**
-      - .github/workflows/metadata-service.yml
+      - "metadata-service/**"
+      - ".github/workflows/metadata-service.yml"
   pull_request:
 
 concurrency:
