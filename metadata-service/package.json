@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "cross-env NODE_ENV=test vitest",
+    "test-ci": "cross-env NODE_ENV=test vitest --coverage.enabled true",
     "lint": "eslint ."
   },
   "dependencies": {
