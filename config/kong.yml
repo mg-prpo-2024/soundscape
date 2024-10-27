@@ -6,9 +6,9 @@ services:
       - name: metadata-service
         paths:
           - /metadata
-  # - name: service2
-  #   url: http://service2:3002
-  #   routes:
-  #     - name: service2-route
-  #       paths:
-  #         - /service2
+  - name: users-service
+    url: http://users-service:3000
+    routes:
+      - name: users-service
+        paths:
+          - /users

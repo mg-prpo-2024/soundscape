@@ -1,6 +1,6 @@
-# Metadata Service
+# User Service
 
-This service handles the metadata for the Soundscape application.
+This service handles the users and payments for the Soundscape application.
 
 ## Prerequisites
 
