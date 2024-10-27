@@ -111,6 +111,8 @@ jobs:
         run: pnpm test-ci
 
       - name: "Report Coverage"
+        with:
+          working-directory: ./metadata-service
         # Set if: always() to also generate the report if tests are failing
         # Only works if you set `reportOnFailure: true` in your vite config as specified above
         if: always()
