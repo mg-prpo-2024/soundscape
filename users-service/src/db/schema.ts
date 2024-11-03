@@ -1,8 +1,19 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
+  imageUrl: varchar({ length: 255 }),
+  stripeCustomerId: varchar({ length: 255 }).notNull().unique(),
+  createdAt: timestamp().defaultNow(),
+});
+
+export const plansTable = pgTable("plans", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: varchar().notNull().unique(),
+  description: varchar().notNull(),
+  // priceCents: integer().notNull(), // TODO: this would be different depending on country
+  stripeProductId: varchar().notNull().unique(),
+  createdAt: timestamp().defaultNow(),
 });
