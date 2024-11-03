@@ -8,6 +8,9 @@ on:
       - "users-service/**"
       - ".github/workflows/users-service.yml"
   pull_request:
+    paths:
+      - "users-service/**"
+      - ".github/workflows/users-service.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

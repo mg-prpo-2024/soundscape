@@ -8,6 +8,9 @@ on:
       - "metadata-service/**"
       - ".github/workflows/metadata-service.yml"
   pull_request:
+    paths:
+      - "metadata-service/**"
+      - ".github/workflows/metadata-service.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
