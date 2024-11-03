@@ -25,6 +25,18 @@ services:
     environment:
       - NODE_ENV=development
 
+  users-db:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=dev-username
+      - POSTGRES_PASSWORD=dev-password
+      - POSTGRES_DB=users
+    ports:
+      - "5432:5432" # Expose PostgreSQL on port 5432
+    volumes:
+      - users-db-data:/var/lib/postgresql/data # Persist data
+
   s3:
     image: localstack/localstack
     environment:
@@ -69,3 +81,4 @@ services:
 volumes:
   kong-db-data:
   konga-data:
+  users-db-data:
