@@ -12,7 +12,6 @@ import (
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"github.com/danielgtaylor/huma/v2"
 )
 
 // CustomClaims contains custom data we want from the token.
@@ -26,11 +25,7 @@ func (c CustomClaims) Validate(ctx context.Context) error {
 	return nil
 }
 
-func MyMiddleware(ctx huma.Context, next func(huma.Context)) {
-	// Call the next middleware in the chain. This eventually calls the
-	// operation handler as well.
-	next(ctx)
-}
+// TODO: take auth0 domain and audience as arguments
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
 func EnsureValidToken() func(next http.Handler) http.Handler {

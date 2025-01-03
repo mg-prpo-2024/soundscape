@@ -7,7 +7,19 @@ import (
 	"os"
 )
 
-func Login(accessToken string, userSub string) error {
+type Service interface {
+	Login(accessToken string, userSub string) error
+}
+
+type service struct {
+	repo Repository
+}
+
+func NewService(repo Repository) *service {
+	return &service{repo: repo}
+}
+
+func (s *service) Login(accessToken string, userSub string) error {
 	domain := os.Getenv("AUTH0_DOMAIN")
 
 	userDetailsByIdUrl := fmt.Sprintf("https://%s/api/v2/users/%s", domain, userSub)
