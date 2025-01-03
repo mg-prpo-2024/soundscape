@@ -30,10 +30,22 @@ func main() {
 
 		internal.Register(api)
 
+		server := http.Server{
+			Addr:    fmt.Sprintf(":%d", options.Port),
+			Handler: router,
+		}
+
 		// Tell the CLI how to start your server.
 		hooks.OnStart(func() {
 			fmt.Printf("Starting server on port %d...\n", options.Port)
-			http.ListenAndServe(fmt.Sprintf(":%d", options.Port), router)
+			server.ListenAndServe()
+		})
+		hooks.OnStop(func() {
+			// Gracefull shutdown
+			fmt.Printf("Shutting down server...\n")
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			server.Shutdown(ctx)
 		})
 	})
 
