@@ -8,10 +8,12 @@ import (
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/danielgtaylor/huma/v2"
+	"gorm.io/gorm"
 )
 
-func Register(api huma.API) {
-	RegisterSignIn(api)
+func Register(api huma.API, db *gorm.DB, options *Options) {
+	service := NewService(NewRepository(db))
+	RegisterSignIn(api, service)
 }
 
 type SignInInput struct {
@@ -26,7 +28,7 @@ type SignInOutput struct {
 	}
 }
 
-func RegisterSignIn(api huma.API) {
+func RegisterSignIn(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
 		OperationID: "sign-in",
 		Method:      http.MethodPost,
@@ -43,6 +45,7 @@ func RegisterSignIn(api huma.API) {
 		// 	return nil, err
 		// }
 		resp.Body.Message = fmt.Sprintf("Hello, %s!", input.Body.Name)
+		// service.Login(token.Raw, token.RegisteredClaims.Subject)
 		return resp, nil
 	})
 }

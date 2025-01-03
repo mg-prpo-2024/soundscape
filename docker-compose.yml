@@ -1,29 +1,29 @@
 services:
-  metadata-service:
-    build:
-      context: ./metadata-service
-      target: development
-    container_name: metadata-service
-    ports:
-      - "3001:3000" # Expose service on port 3001
-    volumes:
-      - ./metadata-service:/app # Mount current directory for hot reloading
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
+  # metadata-service:
+  #   build:
+  #     context: ./metadata-service
+  #     target: development
+  #   container_name: metadata-service
+  #   ports:
+  #     - "3001:3000" # Expose service on port 3001
+  #   volumes:
+  #     - ./metadata-service:/app # Mount current directory for hot reloading
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
 
-  users-service:
-    build:
-      context: ./users-service
-      target: development
-    container_name: users-service
-    ports:
-      - "3002:3000" # Expose service on port 3001
-    volumes:
-      - ./users-service:/app # Mount current directory for hot reloading
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
+  # users-service:
+  #   build:
+  #     context: ./users-service
+  #     target: development
+  #   container_name: users-service
+  #   ports:
+  #     - "3002:3000" # Expose service on port 3001
+  #   volumes:
+  #     - ./users-service:/app # Mount current directory for hot reloading
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
 
   users-db:
     image: postgres:latest
@@ -37,48 +37,33 @@ services:
     volumes:
       - users-db-data:/var/lib/postgresql/data # Persist data
 
-  s3:
-    image: localstack/localstack
-    environment:
-      - SERVICES=s3
-      - DEFAULT_REGION=us-east-1
-    ports:
-      - "4566:4566" # LocalStack port for all services
-
-  # Kong API Gateway in DB-less mode
-  kong:
-    image: kong:latest
-    container_name: kong
-    depends_on:
-      - metadata-service
-    environment:
-      - KONG_DATABASE=off # DB-less mode
-      - KONG_DECLARATIVE_CONFIG=/config/kong.yml
-      - KONG_PROXY_ACCESS_LOG=/dev/stdout
-      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
-      - KONG_PROXY_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_LISTEN=0.0.0.0:8001
-    volumes:
-      - ./config/kong.yml:/config/kong.yml # Mount the declarative config file
-    ports:
-      - "8000:8000" # Kong proxy
-      - "8001:8001" # Kong admin
-  # konga:
-  #   image: pantsel/konga:latest
-  #   container_name: konga
-  #   depends_on:
-  #     - kong
-  #   ports:
-  #     - "1337:1337" # Expose Konga on port 1337
+  # s3:
+  #   image: localstack/localstack
   #   environment:
-  #     - NODE_ENV=production
-  #   links:
-  #     - kong
-  #   volumes:
-  #     - konga-data:/app/konga
+  #     - SERVICES=s3
+  #     - DEFAULT_REGION=us-east-1
+  #   ports:
+  #     - "4566:4566" # LocalStack port for all services
 
+  # # Kong API Gateway in DB-less mode
+  # kong:
+  #   image: kong:latest
+  #   container_name: kong
+  #   depends_on:
+  #     - metadata-service
+  #   environment:
+  #     - KONG_DATABASE=off # DB-less mode
+  #     - KONG_DECLARATIVE_CONFIG=/config/kong.yml
+  #     - KONG_PROXY_ACCESS_LOG=/dev/stdout
+  #     - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+  #     - KONG_PROXY_ERROR_LOG=/dev/stderr
+  #     - KONG_ADMIN_ERROR_LOG=/dev/stderr
+  #     - KONG_ADMIN_LISTEN=0.0.0.0:8001
+  #   volumes:
+  #     - ./config/kong.yml:/config/kong.yml # Mount the declarative config file
+  #   ports:
+  #     - "8000:8000" # Kong proxy
+  #     - "8001:8001" # Kong admin
 volumes:
-  kong-db-data:
-  konga-data:
+  # kong-db-data:
   users-db-data:
