@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"database/sql"
 	"time"
 
 	"gorm.io/gorm"
@@ -29,9 +30,10 @@ export const plansTable = pgTable("plans", {
 */
 
 type User struct {
-	ID        uint      // Standard field for the primary key
-	CreatedAt time.Time // Automatically managed by GORM for creation time
-	UpdatedAt time.Time // Automatically managed by GORM for update time
+	ID               uint // Standard field for the primary key
+	StripeCustomerId sql.NullString
+	CreatedAt        time.Time // Automatically managed by GORM for creation time
+	UpdatedAt        time.Time // Automatically managed by GORM for update time
 }
 
 func Migrate(db *gorm.DB) {

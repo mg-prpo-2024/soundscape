@@ -5,10 +5,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v81/checkout/session"
 )
 
 type Service interface {
 	Login(accessToken string, userSub string) error
+	Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
 }
 
 type service struct {
@@ -47,4 +51,24 @@ func (s *service) Login(accessToken string, userSub string) error {
 
 	fmt.Println("Response:", string(body))
 	return nil
+}
+
+func (s *service) Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error) {
+	params := &stripe.CheckoutSessionParams{
+		Mode: stripe.String("subscription"),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Price:    stripe.String(planId),
+				Quantity: stripe.Int64(1),
+			},
+		},
+		SuccessURL: stripe.String(successUrl),
+		CancelURL:  stripe.String(cancelUrl),
+		Metadata: map[string]string{
+			"userId": userId,
+		},
+	}
+
+	subscription, err := session.New(params)
+	return subscription, err
 }

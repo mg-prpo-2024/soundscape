@@ -11,4 +11,5 @@ type Options struct {
 	PostgresPort     int    `help:"Port for the Postgres database" default:"5432"`
 	Auth0Domain      string `help:"Auth0 domain"`
 	Auth0Audience    string `help:"Auth0 audience"`
+	StripeSecretKey  string `help:"Stripe secret key"`
 }
