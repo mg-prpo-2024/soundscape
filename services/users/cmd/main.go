@@ -35,6 +35,7 @@ func main() {
 		db := connect(options)
 		internal.Migrate(db)
 
+		registerHealthCheck(router, db)
 		internal.Register(api, db, options)
 
 		server := http.Server{
@@ -73,4 +74,30 @@ func connect(opts *internal.Options) *gorm.DB {
 		panic(err)
 	}
 	return db
+}
+
+func registerHealthCheck(router chi.Router, db *gorm.DB) {
+	router.Get("/livez", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
+	router.Get("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		sqlDB, err := db.DB()
+		if err != nil {
+			http.Error(w, "not ready", http.StatusServiceUnavailable)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(r.Context(), 1*time.Second)
+		defer cancel()
+
+		if err := sqlDB.PingContext(ctx); err != nil {
+			http.Error(w, "not ready: "+err.Error(), http.StatusServiceUnavailable)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ready"))
+	})
 }
