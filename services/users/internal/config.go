@@ -9,4 +9,6 @@ type Options struct {
 	PostgresPassword string `help:"Password for the Postgres database"`
 	PostgresDB       string `help:"DB name for the Postgres database"`
 	PostgresPort     int    `help:"Port for the Postgres database" default:"5432"`
+	Auth0Domain      string `help:"Auth0 domain"`
+	Auth0Audience    string `help:"Auth0 audience"`
 }

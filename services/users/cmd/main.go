@@ -28,15 +28,12 @@ func main() {
 		router.Use(chimiddleware.RequestID)
 		router.Use(chimiddleware.Recoverer)
 		router.Use(chimiddleware.Logger)
-		router.Use(middleware.EnsureValidToken())
-
-		api := humachi.New(router, huma.DefaultConfig("Users API", "1.0.0"))
 
 		db := connect(options)
 		internal.Migrate(db)
 
 		registerHealthCheck(router, db)
-		internal.Register(api, db, options)
+		registerApi(router, db, options)
 
 		server := http.Server{
 			Addr:    fmt.Sprintf(":%d", options.Port),
@@ -57,7 +54,6 @@ func main() {
 		})
 	})
 
-	// Run the CLI. When passed no commands, it starts the server.
 	cli.Run()
 }
 
@@ -100,4 +96,26 @@ func registerHealthCheck(router chi.Router, db *gorm.DB) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ready"))
 	})
+}
+
+func registerApi(router chi.Router, db *gorm.DB, options *internal.Options) {
+	config := huma.DefaultConfig("Users API", "1.0.0")
+	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		"auth0": {
+			Type: "oauth2",
+			Flows: &huma.OAuthFlows{
+				AuthorizationCode: &huma.OAuthFlow{
+					AuthorizationURL: fmt.Sprintf("https://%s/authorize", options.Auth0Domain),
+					TokenURL:         fmt.Sprintf("https://%s/oauth/token", options.Auth0Domain),
+					Scopes: map[string]string{
+						"openid": "openid scope description...",
+					},
+				},
+			},
+		},
+	}
+
+	api := humachi.New(router, config)
+	api.UseMiddleware(middleware.NewAuthMiddleware(api, options.Auth0Domain, options.Auth0Audience))
+	internal.Register(api, db, options)
 }

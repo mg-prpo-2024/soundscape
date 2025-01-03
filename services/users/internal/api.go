@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
-	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/danielgtaylor/huma/v2"
 	"gorm.io/gorm"
 )
@@ -36,10 +34,13 @@ func RegisterSignIn(api huma.API, service Service) {
 		Summary:     "Sign in",
 		Description: "Sign in to the system.",
 		Tags:        []string{"Sign In"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
 	}, func(ctx context.Context, input *SignInInput) (*SignInOutput, error) {
 		resp := &SignInOutput{}
-		token := ctx.Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
-		fmt.Printf("token %+v", token)
+		// token := ctx.Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
+		// fmt.Printf("token %+v", token)
 		// err := Login("", token.RegisteredClaims.Subject)
 		// if err != nil {
 		// 	return nil, err
