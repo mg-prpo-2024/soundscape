@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/webhook"
 	"gorm.io/gorm"
@@ -21,7 +21,7 @@ func Register(api huma.API, db *gorm.DB, options *Options) {
 	registerCreateUser(api, service)
 	registerGetUser(api, service)
 	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
-	registerSubscribe(api, service)
+	registerCreateSubscription(api, service)
 	registerStripeHook(api, service)
 	// registerGetPayments(api, service)
 	// registerGetCustomer(api, service)
@@ -98,9 +98,9 @@ type CreateSubscriptionOutput struct {
 	Body CreateSubscriptionOutput_Body
 }
 
-func registerSubscribe(api huma.API, service Service) {
+func registerCreateSubscription(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
-		OperationID: "subscribe",
+		OperationID: "create-subscription",
 		Method:      http.MethodPost,
 		Path:        "/subscriptions",
 		Summary:     "Create a subscription",
@@ -110,13 +110,11 @@ func registerSubscribe(api huma.API, service Service) {
 			{"auth0": {"openid"}},
 		},
 	}, func(ctx context.Context, input *CreateSubscriptionInput) (*CreateSubscriptionOutput, error) {
-		fmt.Printf("input %+v\n", input.Body)
 		body := input.Body
 		subscription, err := service.Subscribe(body.PlanId, body.UserId, body.SuccessUrl, body.CancelUrl)
 		if err != nil {
 			return nil, huma.Error500InternalServerError("Error creating subscription", err)
 		}
-		fmt.Printf("subscription %#+v\n", subscription)
 		return &CreateSubscriptionOutput{
 			Body: CreateSubscriptionOutput_Body{Id: subscription.ID, URL: subscription.URL},
 		}, nil
@@ -130,7 +128,7 @@ type WebhookInput struct {
 func (wi *WebhookInput) Resolve(ctx huma.Context) []error {
 	b, err := io.ReadAll(ctx.BodyReader())
 	if err != nil {
-		log.Printf("io.ReadAll error: %v", err)
+		logrus.Errorf("io.ReadAll error: %v", err)
 		return []error{&huma.ErrorDetail{
 			Message: "Unable to read request body.",
 		}}
@@ -139,7 +137,7 @@ func (wi *WebhookInput) Resolve(ctx huma.Context) []error {
 	webhookSecret := os.Getenv("SERVICE_STRIPE_WEBHOOK_SECRET")
 	event, err := webhook.ConstructEvent(b, ctx.Header("Stripe-Signature"), webhookSecret)
 	if err != nil {
-		log.Printf("webhook.constructevent: %v", err)
+		logrus.Errorf("webhook.constructevent: %v", err)
 		return []error{&huma.ErrorDetail{
 			Message: fmt.Sprintf("Unable to construct webhook event: %v", err),
 		}}
@@ -190,8 +188,8 @@ func registerStripeHook(api huma.API, service Service) {
 func PrettyPrint(v interface{}) {
 	prettyJSON, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		fmt.Println("Pretty Print Error:", err)
+		logrus.Println("Pretty Print Error:", err)
 		return
 	}
-	fmt.Println(string(prettyJSON))
+	logrus.Println(string(prettyJSON))
 }
