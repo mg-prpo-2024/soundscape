@@ -11,4 +11,5 @@ RUN make build
 FROM debian:bookworm
 
 COPY --from=builder /app/main /usr/local/bin/
+EXPOSE 8080
 CMD ["main"]
