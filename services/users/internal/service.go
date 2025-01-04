@@ -13,11 +13,14 @@ import (
 type Service interface {
 	Login(accessToken string, userSub string) error
 	Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
+	ProvisionSubscription(session *stripe.CheckoutSession) error
 }
 
 type service struct {
 	repo Repository
 }
+
+var _ Service = (*service)(nil)
 
 func NewService(repo Repository) *service {
 	return &service{repo: repo}
@@ -71,4 +74,8 @@ func (s *service) Subscribe(planId, userId, successUrl, cancelUrl string) (*stri
 
 	subscription, err := session.New(params)
 	return subscription, err
+}
+
+func (s *service) ProvisionSubscription(session *stripe.CheckoutSession) error {
+	return nil
 }

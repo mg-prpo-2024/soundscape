@@ -2,11 +2,16 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v81/webhook"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +19,11 @@ func Register(api huma.API, db *gorm.DB, options *Options) {
 	service := NewService(NewRepository(db))
 	stripe.Key = options.StripeSecretKey
 	registerSignIn(api, service)
+	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
 	registerSubscribe(api, service)
+	registerStripeHook(api, service)
+	// registerGetPayments(api, service)
+	// registerGetCustomer(api, service)
 }
 
 type SignInInput struct {
@@ -29,6 +38,8 @@ type SignInOutput struct {
 	}
 }
 
+// TODO: implement route
+// this should be an auth0 webhook, but for now, it will just be a api call from the frontend
 func registerSignIn(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
 		OperationID: "sign-in",
@@ -96,44 +107,74 @@ func registerSubscribe(api huma.API, service Service) {
 	})
 }
 
-// TODO: custom serializer for webhook event
+type WebhookInput struct {
+	Event *stripe.Event
+}
 
-// type WebhookInput struct {}
+func (wi *WebhookInput) Resolve(ctx huma.Context) []error {
+	b, err := io.ReadAll(ctx.BodyReader())
+	if err != nil {
+		log.Printf("io.ReadAll error: %v", err)
+		return []error{&huma.ErrorDetail{
+			Message: "Unable to read request body.",
+		}}
+	}
+	// for local, run `make stripe-webhook-forward`, which will provide the secret
+	webhookSecret := os.Getenv("SERVICE_STRIPE_WEBHOOK_SECRET")
+	event, err := webhook.ConstructEvent(b, ctx.Header("Stripe-Signature"), webhookSecret)
+	if err != nil {
+		log.Printf("webhook.constructevent: %v", err)
+		return []error{&huma.ErrorDetail{
+			Message: fmt.Sprintf("Unable to construct webhook event: %v", err),
+		}}
+	}
+	wi.Event = &event
+	return []error{}
+}
 
-// func registerStripeHook(api huma.API, service Service) {
-// 	huma.Register(api, huma.Operation{
-// 		OperationID: "stripe-hook",
-// 		Method:      http.MethodPost,
-// 	}, func(ctx context.Context, input *interface{}) (*interface{}, error) {
-//   b, err := io.ReadAll(r.Body)
-//   if err != nil {
-//     http.Error(w, err.Error(), http.StatusBadRequest)
-//     log.Printf("ioutil.ReadAll: %v", err)
-//     return
-//   }
+func registerStripeHook(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "stripe-webhook",
+		Method:      http.MethodPost,
+		Path:        "/stripe-webhook",
+		Summary:     "Stripe Webhook",
+		Description: "Stripe webhook endpoint.",
+	}, func(ctx context.Context, input *WebhookInput) (*struct{}, error) {
+		event := *input.Event
+		switch event.Type {
+		case "checkout.session.completed":
+			// Payment is successful and the subscription is created.
+			// You should provision the subscription and save the customer ID to your database.
+			PrettyPrint(event)
+			var checkoutSession stripe.CheckoutSession
+			err := json.Unmarshal(event.Data.Raw, &checkoutSession)
+			if err != nil {
+				return nil, huma.Error422UnprocessableEntity("Unable to parse stripe.CheckoutSession")
+			}
+			// TODO: set customer ID in users table for user with metadata.userId
+			// for now, everything else will be fetched from stripe
+			err = service.ProvisionSubscription(&checkoutSession)
+			return nil, err
+		case "invoice.paid":
+			// Continue to provision the subscription as payments continue to be made.
+			// Store the status in your database and check when a user accesses your service.
+			// This approach helps you avoid hitting rate limits.
+		case "invoice.payment_failed":
+			// The payment failed or the customer does not have a valid payment method.
+			// The subscription becomes past_due. Notify your customer and send them to the
+			// customer portal to update their payment information.
+		default:
+			// unhandled event type
+		}
+		return nil, nil
+	})
+}
 
-//   event, err := webhook.ConstructEvent(b, r.Header.Get("Stripe-Signature"), "{{STRIPE_WEBHOOK_SECRET}}")
-//   if err != nil {
-//     http.Error(w, err.Error(), http.StatusBadRequest)
-//     log.Printf("webhook.ConstructEvent: %v", err)
-//     return
-//   }
-
-//   switch event.Type {
-//     case "checkout.session.completed":
-//       // Payment is successful and the subscription is created.
-//       // You should provision the subscription and save the customer ID to your database.
-//     case "invoice.paid":
-//       // Continue to provision the subscription as payments continue to be made.
-//       // Store the status in your database and check when a user accesses your service.
-//       // This approach helps you avoid hitting rate limits.
-//     case "invoice.payment_failed":
-//       // The payment failed or the customer does not have a valid payment method.
-//       // The subscription becomes past_due. Notify your customer and send them to the
-//       // customer portal to update their payment information.
-//     default:
-//       // unhandled event type
-//   }
-// 		return nil, nil
-// 	})
-// }
+func PrettyPrint(v interface{}) {
+	prettyJSON, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		fmt.Println("Pretty Print Error:", err)
+		return
+	}
+	fmt.Println(string(prettyJSON))
+}
