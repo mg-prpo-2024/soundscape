@@ -10,6 +10,8 @@ type repository struct {
 	db *gorm.DB
 }
 
+var _ Repository = (*repository)(nil)
+
 func NewRepository(db *gorm.DB) *repository {
 	return &repository{db: db}
 }

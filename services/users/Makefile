@@ -11,6 +11,9 @@ build:
 run:
 	@go run cmd/main.go
 
+stripe-webhook-forward:
+	@stripe listen --forward-to localhost:8888/stripe-webhook
+
 # TODO: fix
 docker-run:
 	@if docker compose up 2>/dev/null; then \
