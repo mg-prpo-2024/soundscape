@@ -1,17 +1,13 @@
 package internal
 
 import (
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/checkout/session"
 )
 
 type Service interface {
-	Login(accessToken string, userSub string) error
+	CreateUser(user UserDto) error
+	GetUser(id string) (*UserDto, error)
 	Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
 	ProvisionSubscription(session *stripe.CheckoutSession) error
 }
@@ -26,34 +22,16 @@ func NewService(repo Repository) *service {
 	return &service{repo: repo}
 }
 
-func (s *service) Login(accessToken string, userSub string) error {
-	domain := os.Getenv("AUTH0_DOMAIN")
+func (s *service) CreateUser(user UserDto) error {
+	return s.repo.CreateUser(user)
+}
 
-	userDetailsByIdUrl := fmt.Sprintf("https://%s/api/v2/users/%s", domain, userSub)
-	req, err := http.NewRequest("GET", userDetailsByIdUrl, nil)
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Error making request:", err)
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return err
-	}
-
-	fmt.Println("Response:", string(body))
-	return nil
+func (s *service) GetUser(id string) (*UserDto, error) {
+	// uuid, err := uuid.Parse(id)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return s.repo.GetUser(id)
 }
 
 func (s *service) Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error) {
@@ -77,5 +55,6 @@ func (s *service) Subscribe(planId, userId, successUrl, cancelUrl string) (*stri
 }
 
 func (s *service) ProvisionSubscription(session *stripe.CheckoutSession) error {
-	return nil
+	userId := session.Metadata["userId"]
+	return s.repo.SetCustomerId(userId, session.Customer.ID)
 }
