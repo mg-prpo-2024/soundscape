@@ -31,5 +31,7 @@ jobs:
 
       - name: Build
         run: go build -v ./...
+        working-directory: services/users
       - name: Test with the Go CLI
         run: go test ./...
+        working-directory: services/users
