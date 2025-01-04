@@ -168,7 +168,7 @@ func registerStripeHook(api huma.API, service Service) {
 			if err != nil {
 				return nil, huma.Error422UnprocessableEntity("Unable to parse stripe.CheckoutSession")
 			}
-			// TODO: set customer ID in users table for user with metadata.userId
+			// sets customer ID in users table
 			// for now, everything else will be fetched from stripe
 			err = service.ProvisionSubscription(&checkoutSession)
 			return nil, err
