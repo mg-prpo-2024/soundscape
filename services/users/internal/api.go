@@ -18,7 +18,8 @@ import (
 func Register(api huma.API, db *gorm.DB, options *Options) {
 	service := NewService(NewRepository(db))
 	stripe.Key = options.StripeSecretKey
-	registerSignIn(api, service)
+	registerCreateUser(api, service)
+	registerGetUser(api, service)
 	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
 	registerSubscribe(api, service)
 	registerStripeHook(api, service)
@@ -26,42 +27,57 @@ func Register(api huma.API, db *gorm.DB, options *Options) {
 	// registerGetCustomer(api, service)
 }
 
-type SignInInput struct {
-	Body struct {
-		Name string `json:"name" maxLength:"30" example:"world" doc:"Name to greet"`
-	}
+type CreateUserInput struct {
+	Body UserDto
 }
 
-type SignInOutput struct {
-	Body struct {
-		Message string `json:"message" example:"Hello, world!" doc:"Greeting message"`
-	}
-}
+type CreateUserOutput struct{}
 
-// TODO: implement route
-// this should be an auth0 webhook, but for now, it will just be a api call from the frontend
-func registerSignIn(api huma.API, service Service) {
+func registerCreateUser(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
-		OperationID: "sign-in",
+		OperationID: "create-user",
 		Method:      http.MethodPost,
-		Path:        "/sign-in",
-		Summary:     "Sign in",
-		Description: "Sign in to the system.",
-		Tags:        []string{"Sign In"},
+		Path:        "/users",
+		Summary:     "Create a user",
+		Description: "A webhook endpoint called when a user is created in Auth0.",
+		Tags:        []string{"Users"},
 		Security: []map[string][]string{
-			{"auth0": {"openid"}},
+			{"Auth0WebhookSecret": []string{}},
 		},
-	}, func(ctx context.Context, input *SignInInput) (*SignInOutput, error) {
-		resp := &SignInOutput{}
-		// token := ctx.Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
-		// fmt.Printf("token %+v", token)
-		// err := Login("", token.RegisteredClaims.Subject)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		resp.Body.Message = fmt.Sprintf("Hello, %s!", input.Body.Name)
-		// service.Login(token.Raw, token.RegisteredClaims.Subject)
-		return resp, nil
+	}, func(ctx context.Context, input *CreateUserInput) (*CreateUserOutput, error) {
+		err := service.CreateUser(input.Body)
+		if err != nil {
+			return nil, err
+		}
+		return &CreateUserOutput{}, nil
+	})
+}
+
+type GetUserInput struct {
+	Id string `path:"id" doc:"User ID"`
+}
+
+type GetUserOutput struct {
+	Body UserDto
+}
+
+func registerGetUser(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-user",
+		Method:      http.MethodGet,
+		Path:        "/users/{id}",
+		Summary:     "Create a user",
+		Description: "A webhook endpoint called when a user is created in Auth0.",
+		Tags:        []string{"Users"},
+		Security: []map[string][]string{
+			{"Auth0WebhookSecret": []string{}},
+		},
+	}, func(ctx context.Context, input *GetUserInput) (*GetUserOutput, error) {
+		user, err := service.GetUser(input.Id)
+		if err != nil {
+			return nil, err
+		}
+		return &GetUserOutput{Body: *user}, nil
 	})
 }
 
@@ -86,10 +102,10 @@ func registerSubscribe(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
 		OperationID: "subscribe",
 		Method:      http.MethodPost,
-		Path:        "/subscribe",
+		Path:        "/subscriptions",
 		Summary:     "Create a subscription",
 		Description: "Create a stripe subscription.",
-		Tags:        []string{"Subscription"},
+		Tags:        []string{"Subscriptions"},
 		Security: []map[string][]string{
 			{"auth0": {"openid"}},
 		},
@@ -139,6 +155,7 @@ func registerStripeHook(api huma.API, service Service) {
 		Path:        "/stripe-webhook",
 		Summary:     "Stripe Webhook",
 		Description: "Stripe webhook endpoint.",
+		Tags:        []string{"Subscriptions"},
 	}, func(ctx context.Context, input *WebhookInput) (*struct{}, error) {
 		event := *input.Event
 		switch event.Type {
@@ -151,7 +168,7 @@ func registerStripeHook(api huma.API, service Service) {
 			if err != nil {
 				return nil, huma.Error422UnprocessableEntity("Unable to parse stripe.CheckoutSession")
 			}
-			// TODO: set customer ID in users table for user with metadata.userId
+			// sets customer ID in users table
 			// for now, everything else will be fetched from stripe
 			err = service.ProvisionSubscription(&checkoutSession)
 			return nil, err

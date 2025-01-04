@@ -41,7 +41,7 @@ func main() {
 		}))
 
 		db := connect(options)
-		internal.Migrate(db)
+		internal.AutoMigrate(db)
 
 		registerHealthCheck(router, db)
 		registerApi(router, db, options)
@@ -123,6 +123,11 @@ func registerApi(router chi.Router, db *gorm.DB, options *internal.Options) {
 					},
 				},
 			},
+		},
+		"Auth0WebhookSecret": {
+			Type: "apiKey",
+			In:   "header",
+			Name: "X-Auth0-Webhook-Secret",
 		},
 	}
 
