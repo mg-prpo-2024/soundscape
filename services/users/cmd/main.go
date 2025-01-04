@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -53,12 +54,12 @@ func main() {
 
 		// Tell the CLI how to start your server.
 		hooks.OnStart(func() {
-			fmt.Printf("Starting server on port %d...\n", options.Port)
+			logrus.Infof("Starting server on port %d...\n", options.Port)
 			server.ListenAndServe()
 		})
 		hooks.OnStop(func() {
 			// Gracefull shutdown
-			fmt.Printf("Shutting down server...\n")
+			logrus.Infof("Shutting down server...\n")
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 			server.Shutdown(ctx)
