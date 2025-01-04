@@ -73,4 +73,5 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
       # Deploy to AKS
       - name: Apply Kubernetes manifests
+        working-directory: ./services/users
         run: kubectl apply -f deployment.yaml
