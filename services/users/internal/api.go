@@ -71,7 +71,7 @@ func registerGetUser(api huma.API, service Service) {
 		Method:      http.MethodGet,
 		Path:        "/users/{id}",
 		Summary:     "Get a user",
-		Description: "Get a user by identifier.",
+		Description: "Get a user by ID.",
 		Tags:        []string{"Users"},
 		Security: []map[string][]string{
 			{"auth0": {"openid"}},
