@@ -7,6 +7,7 @@ type Options struct {
 	PostgresUrl         string `help:"Host for the Postgres database"`
 	Auth0Domain         string `help:"Auth0 domain"`
 	Auth0Audience       string `help:"Auth0 audience"`
+	Auth0HookSecret     string `help:"Auth0 webhook secret"`
 	StripeSecretKey     string `help:"Stripe secret key"`
 	StripeWebhookSecret string `help:"Stripe webhook secret"`
 }

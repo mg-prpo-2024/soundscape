@@ -18,7 +18,7 @@ import (
 func Register(api huma.API, db *gorm.DB, options *Options) {
 	service := NewService(NewRepository(db))
 	stripe.Key = options.StripeSecretKey
-	registerCreateUser(api, service)
+	registerCreateUser(api, service, options)
 	registerGetUser(api, service)
 	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
 	registerCreateSubscription(api, service)
@@ -28,12 +28,13 @@ func Register(api huma.API, db *gorm.DB, options *Options) {
 }
 
 type CreateUserInput struct {
-	Body UserDto
+	Secret string `header:"X-Auth0-Webhook-Secret" doc:"Auth0 Webhook Secret"`
+	Body   UserDto
 }
 
 type CreateUserOutput struct{}
 
-func registerCreateUser(api huma.API, service Service) {
+func registerCreateUser(api huma.API, service Service, opts *Options) {
 	huma.Register(api, huma.Operation{
 		OperationID: "create-user",
 		Method:      http.MethodPost,
@@ -45,7 +46,9 @@ func registerCreateUser(api huma.API, service Service) {
 			{"Auth0WebhookSecret": []string{}},
 		},
 	}, func(ctx context.Context, input *CreateUserInput) (*CreateUserOutput, error) {
-		// TODO: check if secret is valid
+		if input.Secret != opts.Auth0HookSecret {
+			return nil, huma.Error401Unauthorized("Invalid webhook secret")
+		}
 		err := service.CreateUser(input.Body)
 		if err != nil {
 			return nil, err
