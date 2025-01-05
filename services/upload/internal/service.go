@@ -1,7 +1,7 @@
 package internal
 
 type Service interface {
-	CreateArtist(user ArtistDto) error
+	CreateArtist(artist ArtistDto) error
 }
 
 type service struct {
@@ -14,6 +14,6 @@ func NewService(repo Repository) *service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateArtist(user ArtistDto) error {
-	return s.repo.CreateArtist(user)
+func (s *service) CreateArtist(artist ArtistDto) error {
+	return s.repo.CreateArtist(artist)
 }

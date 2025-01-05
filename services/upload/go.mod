@@ -1,4 +1,4 @@
-module users
+module upload
 
 go 1.23.1
 

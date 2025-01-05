@@ -14,12 +14,12 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 	// registerGetCustomer(api, service)
 }
 
-type CreateUserInput struct {
+type CreateArtistInput struct {
 	Secret string `header:"X-Auth0-Webhook-Secret" doc:"Auth0 Webhook Secret"`
 	Body   ArtistDto
 }
 
-type CreateUserOutput struct{}
+type CreateArtistOutput struct{}
 
 func registerCreateArtist(api huma.API, service Service) {
 	huma.Register(api, huma.Operation{
@@ -28,15 +28,15 @@ func registerCreateArtist(api huma.API, service Service) {
 		Path:        "/artists",
 		Summary:     "Create an artist",
 		Description: "Create an artist.",
-		Tags:        []string{"Users"},
+		Tags:        []string{"Artists"},
 		Security: []map[string][]string{
 			{"auth0": {"openid"}},
 		},
-	}, func(ctx context.Context, input *CreateUserInput) (*CreateUserOutput, error) {
+	}, func(ctx context.Context, input *CreateArtistInput) (*CreateArtistOutput, error) {
 		err := service.CreateArtist(input.Body)
 		if err != nil {
 			return nil, err
 		}
-		return &CreateUserOutput{}, nil
+		return &CreateArtistOutput{}, nil
 	})
 }
