@@ -70,6 +70,7 @@ func main() {
 }
 
 func connect(opts *internal.Options) *gorm.DB {
+	fmt.Println("ENV VARS")
 	internal.PrettyPrint(opts)
 	dsn := opts.PostgresUrl
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
