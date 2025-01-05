@@ -189,8 +189,8 @@ func registerStripeHook(api huma.API, service Service) {
 func PrettyPrint(v interface{}) {
 	prettyJSON, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		fmt.Println("Pretty Print Error:", err)
+		logrus.Println("Pretty Print Error:", err)
 		return
 	}
-	fmt.Println(string(prettyJSON))
+	logrus.Println(string(prettyJSON))
 }
