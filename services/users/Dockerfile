@@ -10,6 +10,7 @@ RUN make build
 
 FROM debian:bookworm
 
+ENV SERVICE_APP_ENV=production
 COPY --from=builder /app/main /usr/local/bin/
 EXPOSE 8080
 CMD ["main"]
