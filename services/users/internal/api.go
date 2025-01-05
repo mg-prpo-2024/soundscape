@@ -67,8 +67,8 @@ func registerGetUser(api huma.API, service Service) {
 		OperationID: "get-user",
 		Method:      http.MethodGet,
 		Path:        "/users/{id}",
-		Summary:     "Create a user",
-		Description: "A webhook endpoint called when a user is created in Auth0.",
+		Summary:     "Get a user",
+		Description: "Get a user by ID.",
 		Tags:        []string{"Users"},
 		Security: []map[string][]string{
 			{"auth0": {"openid"}},
