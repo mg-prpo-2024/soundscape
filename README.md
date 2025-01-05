@@ -18,10 +18,15 @@ The action needs:
 
 ```ts
 exports.onExecutePostLogin = async (event, api) => {
+  const app = event.client.name;
+  if (app !== "soundscape" && app !== "soundscape-prod") {
+    return;
+  }
   if (event.user.app_metadata.localUserCreated) {
     return;
   }
-  const endpoint = "https://75b6-93-103-238-188.ngrok-free.app";
+  const endpoint =
+    app === "soundscape" ? "https://keen-wealthy-bengal.ngrok-free.app" : "http://72.144.96.197";
   const user = {
     email: event.user.email,
     id: event.user.user_id,
