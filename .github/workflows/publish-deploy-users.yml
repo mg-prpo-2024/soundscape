@@ -55,6 +55,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Configure kubectl to use AKS
+      # TODO: remove these from secrets, just hardcode them
       - name: Configure kubectl
         run: |
           az aks get-credentials \

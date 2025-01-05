@@ -37,13 +37,15 @@ services:
     volumes:
       - users-db-data:/var/lib/postgresql/data # Persist data
 
-  # s3:
-  #   image: localstack/localstack
-  #   environment:
-  #     - SERVICES=s3
-  #     - DEFAULT_REGION=us-east-1
-  #   ports:
-  #     - "4566:4566" # LocalStack port for all services
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service (optional)
+    volumes:
+      - ./azurite/data:/data # Data directory for persistent storage
+    environment:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFE/jNdBxRTtddeyb==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
 
   # # Kong API Gateway in DB-less mode
   # kong:
