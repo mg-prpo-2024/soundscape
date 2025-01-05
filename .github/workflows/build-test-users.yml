@@ -4,14 +4,12 @@ on:
     branches:
       - main
     paths:
-      - "services/user/**"
+      - "services/users/**"
       - "pkg/**"
-      - ".github/workflows/users-service.yml"
   pull_request:
     paths:
-      - "users-service/**"
+      - "services/users/**"
       - "pkg/**"
-      - ".github/workflows/users-service.yml"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
