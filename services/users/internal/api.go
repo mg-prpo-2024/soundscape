@@ -45,6 +45,7 @@ func registerCreateUser(api huma.API, service Service) {
 			{"Auth0WebhookSecret": []string{}},
 		},
 	}, func(ctx context.Context, input *CreateUserInput) (*CreateUserOutput, error) {
+		// TODO: check if secret is valid
 		err := service.CreateUser(input.Body)
 		if err != nil {
 			return nil, err
@@ -66,11 +67,11 @@ func registerGetUser(api huma.API, service Service) {
 		OperationID: "get-user",
 		Method:      http.MethodGet,
 		Path:        "/users/{id}",
-		Summary:     "Create a user",
-		Description: "A webhook endpoint called when a user is created in Auth0.",
+		Summary:     "Get a user",
+		Description: "Get a user by ID.",
 		Tags:        []string{"Users"},
 		Security: []map[string][]string{
-			{"Auth0WebhookSecret": []string{}},
+			{"auth0": {"openid"}},
 		},
 	}, func(ctx context.Context, input *GetUserInput) (*GetUserOutput, error) {
 		user, err := service.GetUser(input.Id)

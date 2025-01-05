@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-service
+  template:
+    metadata:
+      labels:
+        app: users-service
+    spec:
+      containers:
+        - name: users-service
+          image: markogartnar/soundscape-users:latest
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SERVICE_AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: AUTH0_DOMAIN
+            - name: SERVICE_AUTH0_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: AUTH0_AUDIENCE
+            - name: SERVICE_AUTH0_HOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: AUTH0_HOOK_SECRET
+            - name: SERVICE_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: POSTGRES_URL
+            - name: SERVICE_STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: SERVICE_STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -70,13 +70,7 @@ func main() {
 }
 
 func connect(opts *internal.Options) *gorm.DB {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		opts.PostgresHost,
-		opts.PostgresUser,
-		opts.PostgresPassword,
-		opts.PostgresDB,
-		opts.PostgresPort,
-	)
+	dsn := opts.PostgresUrl
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)

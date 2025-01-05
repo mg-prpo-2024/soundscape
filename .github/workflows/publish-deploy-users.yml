@@ -1,0 +1,79 @@
+name: Publish & Deploy Users Service
+
+on:
+  push:
+    branches:
+      - main # Trigger workflow on pushes to main
+  # TODO: remove this
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/users
+          push: true
+          tags: markogartnar/soundscape-users:latest
+
+  deploy-to-aks:
+    runs-on: ubuntu-latest
+    needs: build-and-push # Wait for the image build job to finish
+
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
+
+      # Authenticate to Azure
+      - name: Authenticate to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Configure kubectl to use AKS
+      - name: Configure kubectl
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
+            --name ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Create Kubernetes Secret
+        run: |
+          kubectl create secret generic app-secrets \
+            --from-literal=AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
+            --from-literal=AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
+            --from-literal=AUTH0_HOOK_SECRET="${{ secrets.AUTH0_HOOK_SECRET }}" \
+            --from-literal=POSTGRES_URL="${{ secrets.USERS_POSTGRES_URL }}" \
+            --from-literal=STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" \
+            --from-literal=STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+      # Deploy to AKS
+      - name: Apply Kubernetes manifests
+        working-directory: ./services/users
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/public-svc.yaml  # Ensure LoadBalancer is created
