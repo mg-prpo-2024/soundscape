@@ -21,7 +21,8 @@ exports.onExecutePostLogin = async (event, api) => {
   if (event.user.app_metadata.localUserCreated) {
     return;
   }
-  const endpoint = "https://75b6-93-103-238-188.ngrok-free.app";
+  const endpoint = "https://keen-wealthy-bengal.ngrok-free.app"; // local
+  const endpoint = "http://72.144.96.197"; // prod
   const user = {
     email: event.user.email,
     id: event.user.user_id,
