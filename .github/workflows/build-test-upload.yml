@@ -1,0 +1,31 @@
+name: ⬣ Build & Test Upload Service
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/upload/**"
+      - "pkg/**"
+  pull_request:
+    paths:
+      - "services/upload/**"
+      - "pkg/**"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.23.x"
+
+      - name: Build
+        run: go build -v ./...
+        working-directory: services/upload
+      - name: Test with the Go CLI
+        run: go test ./...
+        working-directory: services/upload

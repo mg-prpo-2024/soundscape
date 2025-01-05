@@ -3,11 +3,17 @@ name: Publish & Deploy Users Service
 on:
   push:
     branches:
-      - main # Trigger workflow on pushes to main
-  # TODO: remove this
+      - main
+    paths:
+      - "services/users/**"
+      - "pkg/**"
+  # TODO: remove/comment out this
   pull_request:
     branches:
       - main
+    paths:
+      - "services/users/**"
+      - "pkg/**"
 
 jobs:
   build-and-push:
@@ -55,6 +61,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Configure kubectl to use AKS
+      # TODO: remove these from secrets, just hardcode them
       - name: Configure kubectl
         run: |
           az aks get-credentials \
