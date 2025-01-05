@@ -9,4 +9,4 @@ spec:
       port: 80
       targetPort: 8888
   selector:
-    app: public-svc
+    app: users-service
