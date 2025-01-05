@@ -15,13 +15,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Register(api huma.API, db *gorm.DB, options *Options) {
+func Register(api huma.API, db *gorm.DB, config *Config) {
 	service := NewService(NewRepository(db))
-	stripe.Key = options.StripeSecretKey
-	registerCreateUser(api, service, options)
+	stripe.Key = config.StripeSecretKey
+	registerCreateUser(api, service, config)
 	registerGetUser(api, service)
 	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
-	registerCreateSubscription(api, service)
+	registerCreateSubscription(api, service, config)
 	registerStripeHook(api, service)
 	// registerGetPayments(api, service)
 	// registerGetCustomer(api, service)
@@ -34,7 +34,7 @@ type CreateUserInput struct {
 
 type CreateUserOutput struct{}
 
-func registerCreateUser(api huma.API, service Service, opts *Options) {
+func registerCreateUser(api huma.API, service Service, opts *Config) {
 	huma.Register(api, huma.Operation{
 		OperationID: "create-user",
 		Method:      http.MethodPost,
@@ -88,7 +88,7 @@ func registerGetUser(api huma.API, service Service) {
 type CreateSubscriptionInput struct {
 	Body struct {
 		UserId     string `json:"user_id" example:"123123123" doc:"User ID"`
-		PlanId     string `json:"plan_id" example:"prod_1234" doc:"Plan ID"`
+		PlanId     string `json:"plan_id" example:"premium" doc:"Plan ID"`
 		SuccessUrl string `json:"success_url" example:"http://example.com/success" doc:"Success URL"`
 		CancelUrl  string `json:"cancel_url" example:"http://example.com/cancel" doc:"Cancel URL"`
 	}
@@ -102,7 +102,7 @@ type CreateSubscriptionOutput struct {
 	Body CreateSubscriptionOutput_Body
 }
 
-func registerCreateSubscription(api huma.API, service Service) {
+func registerCreateSubscription(api huma.API, service Service, config *Config) {
 	huma.Register(api, huma.Operation{
 		OperationID: "create-subscription",
 		Method:      http.MethodPost,
@@ -115,7 +115,15 @@ func registerCreateSubscription(api huma.API, service Service) {
 		},
 	}, func(ctx context.Context, input *CreateSubscriptionInput) (*CreateSubscriptionOutput, error) {
 		body := input.Body
-		subscription, err := service.Subscribe(body.PlanId, body.UserId, body.SuccessUrl, body.CancelUrl)
+		switch body.PlanId {
+		case "premium":
+			body.PlanId = config.PlanStripeId.Premium
+		case "student":
+			body.PlanId = config.PlanStripeId.Student
+		default:
+			return nil, huma.Error422UnprocessableEntity("Invalid plan ID")
+		}
+		subscription, err := service.CreateSubscription(body.PlanId, body.UserId, body.SuccessUrl, body.CancelUrl)
 		if err != nil {
 			return nil, huma.Error500InternalServerError("Error creating subscription", err)
 		}

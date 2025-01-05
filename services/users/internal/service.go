@@ -8,7 +8,7 @@ import (
 type Service interface {
 	CreateUser(user UserDto) error
 	GetUser(id string) (*UserDto, error)
-	Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
+	CreateSubscription(priceId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
 	ProvisionSubscription(session *stripe.CheckoutSession) error
 }
 
@@ -27,19 +27,15 @@ func (s *service) CreateUser(user UserDto) error {
 }
 
 func (s *service) GetUser(id string) (*UserDto, error) {
-	// uuid, err := uuid.Parse(id)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	return s.repo.GetUser(id)
 }
 
-func (s *service) Subscribe(planId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error) {
+func (s *service) CreateSubscription(priceId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error) {
 	params := &stripe.CheckoutSessionParams{
 		Mode: stripe.String("subscription"),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
-				Price:    stripe.String(planId),
+				Price:    stripe.String(priceId),
 				Quantity: stripe.Int64(1),
 			},
 		},
