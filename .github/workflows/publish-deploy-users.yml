@@ -76,4 +76,4 @@ jobs:
         working-directory: ./services/users
         run: |
           kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml  # Ensure LoadBalancer is created
+          kubectl apply -f k8s/public-svc.yaml  # Ensure LoadBalancer is created
