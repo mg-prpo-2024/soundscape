@@ -25,39 +25,38 @@ spec:
                   key: AUTH0_DOMAIN
             - name: SERVICE_AUTH0_AUDIENCE
               valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: AUTH0_AUDIENCE
+                secretKeyRef:
+                  name: app-secrets
+                  key: AUTH0_AUDIENCE
             - name: SERVICE_AUTH0_HOOK_SECRET
               valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: AUTH0_HOOK_SECRET
+                secretKeyRef:
+                  name: app-secrets
+                  key: AUTH0_HOOK_SECRET
             - name: SERVICE_POSTGRES_URL
               valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: POSTGRES_URL
+                secretKeyRef:
+                  name: app-secrets
+                  key: POSTGRES_URL
             - name: SERVICE_STRIPE_SECRET_KEY
               valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: STRIPE_SECRET_KEY
+                secretKeyRef:
+                  name: app-secrets
+                  key: STRIPE_SECRET_KEY
             - name: SERVICE_STRIPE_WEBHOOK_SECRET
               valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: STRIPE_WEBHOOK_SECRET
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: users-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: users-service
-  ports:
-    - protocol: TCP
-      port: 8888
-      targetPort: 80
+                secretKeyRef:
+                  name: app-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8888
+            initialDelaySeconds: 5
+            periodSeconds: 10
