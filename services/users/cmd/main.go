@@ -23,6 +23,7 @@ import (
 )
 
 func main() {
+	panic("testing instant failure")
 	// Create a CLI app which takes a port option.
 	cli := humacli.New(func(hooks humacli.Hooks, options *internal.Options) {
 		// Create a new router & API
