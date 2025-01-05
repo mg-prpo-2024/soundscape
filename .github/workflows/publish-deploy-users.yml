@@ -81,4 +81,4 @@ jobs:
 
       - name: Confirm Deployment
         run: |
-          kubectl rollout status deployment/users-service
+          kubectl rollout status deployment/users-service --timeout=60s
