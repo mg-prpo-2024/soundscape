@@ -5,7 +5,7 @@ FROM golang:${GO_VERSION}-alpine as builder
 RUN apk add --no-cache make gcc musl-dev
 
 WORKDIR /app
-COPY go.mod go.sum ./
+COPY ../../go.mod ../../go.sum ./
 RUN go mod download && go mod verify
 COPY . .
 RUN make build
