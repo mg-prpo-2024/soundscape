@@ -18,6 +18,7 @@
 
 # Go workspace file
 go.work
+go.work.sum
 tmp/
 
 # IDE specific files
@@ -30,3 +31,5 @@ tmp/
 # Project build
 main
 *templ.go
+
+azurite/*

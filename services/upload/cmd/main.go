@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"soundscape/services/upload/internal"
+	"soundscape/shared"
 	"time"
-	"upload/internal"
-	"upload/middleware"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
@@ -123,6 +123,6 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	}
 
 	api := humachi.New(router, config)
-	api.UseMiddleware(middleware.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
+	api.UseMiddleware(shared.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
 	internal.Register(api, db, appConfig)
 }
