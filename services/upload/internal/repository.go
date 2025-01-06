@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"database/sql"
-
 	"gorm.io/gorm"
 )
 
@@ -21,10 +19,8 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 func (r *repository) CreateArtist(userDto ArtistDto) error {
-	user := User{
-		Auth0Id:          userDto.Id,
-		Email:            userDto.Email,
-		StripeCustomerId: sql.NullString{String: "", Valid: false},
+	user := Artist{
+		Name: userDto.Email,
 	}
 	result := r.db.Create(&user)
 	return result.Error
