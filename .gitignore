@@ -33,3 +33,5 @@ main
 *templ.go
 
 azurite/*
+
+.DS_Store
