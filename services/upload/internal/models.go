@@ -15,6 +15,7 @@ type Base struct {
 
 type Artist struct {
 	Base
+	UserId string
 	Name   string
 	Bio    string
 	Images []Image
