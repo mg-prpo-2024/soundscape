@@ -2,8 +2,6 @@ package internal
 
 import (
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Service interface {
@@ -13,6 +11,7 @@ type Service interface {
 	GetAlbum(id string) (*AlbumDto, error)
 	CreateSong(song CreateSongDto) (*CreateSongResponseDto, error)
 	GetAlbumSongs(id string) ([]*SongDto, error)
+	DeleteSong(id string) error
 }
 
 type service struct {
@@ -99,6 +98,11 @@ func (s *service) GetAlbumSongs(albumId string) ([]*SongDto, error) {
 			Title: song.Title,
 		})
 	}
-	logrus.Println("Songs:", songDtos)
 	return songDtos, nil
+}
+
+func (s *service) DeleteSong(id string) error {
+	// TODO: Delete the song from the storage
+	// s.storage.DeleteSong(id)
+	return s.repo.DeleteSong(id)
 }

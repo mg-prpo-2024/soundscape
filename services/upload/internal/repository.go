@@ -12,6 +12,7 @@ type Repository interface {
 	GetAlbum(id string) (*Album, error)
 	CreateSong(song CreateSongDto) (*Song, error)
 	GetAlbumSongs(albumId string) ([]*Song, error)
+	DeleteSong(id string) error
 }
 
 type repository struct {
@@ -72,4 +73,10 @@ func (r *repository) GetAlbumSongs(albumId string) ([]*Song, error) {
 	var songs []*Song
 	err := r.db.Where("album_id = ?", albumId).Find(&songs).Error
 	return songs, err
+}
+
+func (r *repository) DeleteSong(id string) error {
+	result := r.db.Delete(&Song{}, "id = ?", id)
+
+	return result.Error
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +20,7 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 	registerGetAlbum(api, service)
 	registerCreateSong(api, service)
 	registerGetSongs(api, service)
+	registerDeleteSong(api, service)
 }
 
 type CreateArtistInput struct {
@@ -192,5 +194,27 @@ func registerGetSongs(api huma.API, service Service) {
 		return &GetSongsOutput{
 			Body: songs,
 		}, nil
+	})
+}
+
+type DeleteSongInput struct {
+	SongId string `path:"songId" doc:"Song ID" example:"550e8400-e29b-41d4-a716-446655440000"`
+}
+
+func registerDeleteSong(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "delete-song",
+		Method:      http.MethodDelete,
+		Path:        "/songs/{songId}",
+		Summary:     "Delete a song",
+		Description: "Delete a song.",
+		Tags:        []string{"Songs"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *DeleteSongInput) (*struct{}, error) {
+		err := service.DeleteSong(input.SongId)
+		logrus.Error(err)
+		return nil, err
 	})
 }
