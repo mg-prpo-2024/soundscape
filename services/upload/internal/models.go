@@ -15,10 +15,11 @@ type Base struct {
 
 type Artist struct {
 	Base
+	UserId string
 	Name   string
 	Bio    string
 	Images []Image
-	Songs  []*Song `gorm:"many2many:artist_songs;"`
+	Songs  []*Song `gorm:"constraint:OnDelete:CASCADE;many2many:artist_songs;"`
 }
 
 type Image struct {
@@ -33,7 +34,7 @@ type Song struct {
 	BlobUrl    string
 	TrackOrder uint
 	AlbumId    uuid.UUID
-	Artists    []*Artist `gorm:"many2many:artist_songs;"`
+	Artists    []*Artist `gorm:"constraint:OnDelete:CASCADE;many2many:artist_songs;"`
 }
 
 type Album struct {
