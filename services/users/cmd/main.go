@@ -107,6 +107,10 @@ func registerHealthCheck(router chi.Router, db *gorm.DB) {
 
 func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	config := huma.DefaultConfig("Users API", "1.0.0")
+	config.Info.Description = "API for managing user accounts and payments."
+	config.Servers = append(config.Servers,
+		&huma.Server{URL: "http://72.144.111.234", Description: "Production"},
+	)
 	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"auth0": {
 			Type: "oauth2",
