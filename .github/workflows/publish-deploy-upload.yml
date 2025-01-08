@@ -1,4 +1,4 @@
-name: Publish & Deploy Users Service
+name: Publish & Deploy Upload Service
 
 on:
   push:
