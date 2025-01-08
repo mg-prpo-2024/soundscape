@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-public-svc
+  name: upload-public-svc
 spec:
   type: LoadBalancer
   ports:
