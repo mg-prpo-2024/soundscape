@@ -102,7 +102,10 @@ func (s *service) GetAlbumSongs(albumId string) ([]*SongDto, error) {
 }
 
 func (s *service) DeleteSong(id string) error {
-	// TODO: Delete the song from the storage
-	// s.storage.DeleteSong(id)
+	// TODO: this should be transactional
+	err := s.storage.DeleteFile(id)
+	if err != nil {
+		return err
+	}
 	return s.repo.DeleteSong(id)
 }

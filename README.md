@@ -22,7 +22,7 @@ exports.onExecutePostLogin = async (event, api) => {
     return;
   }
   const endpoint = "https://keen-wealthy-bengal.ngrok-free.app"; // local
-  const endpoint = "http://72.144.96.197"; // prod
+  const endpoint = "http://72.144.111.234"; // prod
   const user = {
     email: event.user.email,
     id: event.user.user_id,
@@ -38,3 +38,13 @@ exports.onExecutePostLogin = async (event, api) => {
   api.user.setAppMetadata("localUserCreated", true);
 };
 ```
+
+### Stripe setup
+
+Set these env vars:
+SERVICE_STRIPE_SECRET_KEY=""
+SERVICE_STRIPE_WEBHOOK_SECRET=""
+
+Setup the Stripe webhook to listen to events of type:
+
+- checkout.session.completed

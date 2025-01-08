@@ -107,6 +107,10 @@ func registerHealthCheck(router chi.Router, db *gorm.DB) {
 
 func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	config := huma.DefaultConfig("Upload API", "1.0.0")
+	config.Info.Description = "Admin API for creators to upload and manage soundscape content."
+	config.Servers = append(config.Servers,
+		&huma.Server{URL: "http://4.182.133.97", Description: "Production"},
+	)
 	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"auth0": {
 			Type: "oauth2",
@@ -120,6 +124,9 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 				},
 			},
 		},
+	}
+	for name := range config.Components.SecuritySchemes {
+		config.Security = append(config.Security, map[string][]string{name: {}})
 	}
 
 	api := humachi.New(router, config)
