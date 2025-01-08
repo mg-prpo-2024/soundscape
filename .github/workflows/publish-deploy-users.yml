@@ -13,7 +13,6 @@ on:
       - main
     paths:
       - "services/users/**"
-      - "services/upload/**" # TODO: DELETE ME
       - "shared/**"
 
 jobs:
