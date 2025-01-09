@@ -16,6 +16,7 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 	)
 	registerCreateArtist(api, service)
 	registerGetArtist(api, service)
+	registerGetArtistAlbums(api, service)
 	registerCreateAlbum(api, service)
 	registerGetAlbum(api, service)
 	registerCreateSong(api, service)
@@ -75,6 +76,36 @@ func registerGetArtist(api huma.API, service Service) {
 		}
 		return &GetArtistOutput{
 			Body: *artist,
+		}, nil
+	})
+}
+
+type GetArtistAlbumsInput struct {
+	ArtistId string `path:"artistId" doc:"Artist ID" example:"550e8400-e29b-41d4-a716-446655440000"`
+}
+
+type GetArtistAlbumsOutput struct {
+	Body []*AlbumDto
+}
+
+func registerGetArtistAlbums(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-artist-albums",
+		Method:      http.MethodGet,
+		Path:        "/artists/{artistId}/albums",
+		Summary:     "Get artist albums",
+		Description: "Get the albums for the artist.",
+		Tags:        []string{"Artists", "Albums"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *GetArtistAlbumsInput) (*GetArtistAlbumsOutput, error) {
+		albums, err := service.GetArtistAlbums(input.ArtistId)
+		if err != nil {
+			return nil, err
+		}
+		return &GetArtistAlbumsOutput{
+			Body: albums,
 		}, nil
 	})
 }
