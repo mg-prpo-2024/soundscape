@@ -70,7 +70,7 @@ jobs:
 
       - name: Create Kubernetes Secret
         run: |
-          kubectl create secret generic app-secrets \
+          kubectl create secret generic users-secrets \
             --from-literal=AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
             --from-literal=AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             --from-literal=AUTH0_HOOK_SECRET="${{ secrets.AUTH0_HOOK_SECRET }}" \

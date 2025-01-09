@@ -22,32 +22,32 @@ spec:
             - name: SERVICE_AUTH0_DOMAIN
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: AUTH0_DOMAIN
             - name: SERVICE_AUTH0_AUDIENCE
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: AUTH0_AUDIENCE
             - name: SERVICE_POSTGRES_URL
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: POSTGRES_URL
             - name: SERVICE_AZURE_ACCOUNT_NAME
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: AZURE_ACCOUNT_NAME
             - name: SERVICE_AZURE_ACCOUNT_KEY
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: AZURE_ACCOUNT_KEY
             - name: SERVICE_AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: app-secrets
+                  name: upload-secrets
                   key: AZURE_CONTAINER_NAME
           livenessProbe:
             httpGet:
