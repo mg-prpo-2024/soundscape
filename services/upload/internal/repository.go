@@ -8,6 +8,7 @@ import (
 type Repository interface {
 	CreateArtist(artist CreateArtistDto) error
 	GetArtist(userId string) (*Artist, error)
+	GetArtistAlbums(artistId string) ([]*Album, error)
 	CreateAlbum(album CreateAlbumDto) (*Album, error)
 	GetAlbum(id string) (*Album, error)
 	CreateSong(song CreateSongDto) (*Song, error)
@@ -41,9 +42,16 @@ func (r *repository) GetArtist(userId string) (*Artist, error) {
 	return artist, err
 }
 
+func (r *repository) GetArtistAlbums(artistId string) ([]*Album, error) {
+	var albums []*Album
+	err := r.db.Where("artist_id = ?", artistId).Find(&albums).Error
+	return albums, err
+}
+
 func (r *repository) CreateAlbum(albumDto CreateAlbumDto) (*Album, error) {
 	album := Album{
-		Title: albumDto.Title,
+		Title:    albumDto.Title,
+		ArtistId: uuid.MustParse(albumDto.ArtistId),
 	}
 	result := r.db.Create(&album)
 	return &album, result.Error

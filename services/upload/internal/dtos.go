@@ -12,12 +12,14 @@ type ArtistDto struct {
 }
 
 type CreateAlbumDto struct {
-	Title string `json:"title" example:"After Hours" doc:"Album title"`
+	Title    string `json:"title" example:"After Hours" doc:"Album title"`
+	ArtistId string `json:"artist_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Artist ID" format:"uuid"`
 }
 
 type AlbumDto struct {
-	Id string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Album ID"`
-	CreateAlbumDto
+	Id        string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Album ID"`
+	Title     string `json:"title" example:"After Hours" doc:"Album title"`
+	CreatedAt string `json:"created_at" example:"2021-01-01T00:00:00Z" doc:"Album creation date"`
 }
 
 type CreateSongDto struct {

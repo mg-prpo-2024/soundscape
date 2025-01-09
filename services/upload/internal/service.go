@@ -7,6 +7,7 @@ import (
 type Service interface {
 	CreateArtist(artist CreateArtistDto) error
 	GetArtist(userId string) (*ArtistDto, error)
+	GetArtistAlbums(artistId string) ([]*AlbumDto, error)
 	CreateAlbum(album CreateAlbumDto) (*AlbumDto, error)
 	GetAlbum(id string) (*AlbumDto, error)
 	CreateSong(song CreateSongDto) (*CreateSongResponseDto, error)
@@ -44,16 +45,30 @@ func (s *service) GetArtist(userId string) (*ArtistDto, error) {
 	}, nil
 }
 
+func (s *service) GetArtistAlbums(artistId string) ([]*AlbumDto, error) {
+	albums, err := s.repo.GetArtistAlbums(artistId)
+	if err != nil {
+		return nil, err
+	}
+	albumDtos := []*AlbumDto{}
+	for _, album := range albums {
+		albumDtos = append(albumDtos, &AlbumDto{
+			Id:        album.ID.String(),
+			Title:     album.Title,
+			CreatedAt: album.CreatedAt.Format(time.RFC3339),
+		})
+	}
+	return albumDtos, nil
+}
+
 func (s *service) CreateAlbum(albumDto CreateAlbumDto) (*AlbumDto, error) {
 	album, err := s.repo.CreateAlbum(albumDto)
 	if err != nil {
 		return nil, err
 	}
 	return &AlbumDto{
-		Id: album.ID.String(),
-		CreateAlbumDto: CreateAlbumDto{
-			Title: album.Title,
-		},
+		Id:    album.ID.String(),
+		Title: album.Title,
 	}, err
 }
 
@@ -63,10 +78,8 @@ func (s *service) GetAlbum(id string) (*AlbumDto, error) {
 		return nil, err
 	}
 	return &AlbumDto{
-		Id: album.ID.String(),
-		CreateAlbumDto: CreateAlbumDto{
-			Title: album.Title,
-		},
+		Id:    album.ID.String(),
+		Title: album.Title,
 	}, nil
 }
 

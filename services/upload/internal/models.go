@@ -19,7 +19,8 @@ type Artist struct {
 	Name   string
 	Bio    string
 	Images []Image
-	Songs  []*Song `gorm:"constraint:OnDelete:CASCADE;many2many:artist_songs;"`
+	Songs  []*Song  `gorm:"constraint:OnDelete:CASCADE;many2many:artist_songs;"`
+	Albums []*Album `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type Image struct {
@@ -39,8 +40,9 @@ type Song struct {
 
 type Album struct {
 	Base
-	Title string
-	Songs []Song
+	Title    string
+	Songs    []Song
+	ArtistId uuid.UUID
 }
 
 // type Genre struct {
