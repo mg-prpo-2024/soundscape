@@ -69,7 +69,7 @@ jobs:
 
       - name: Create Kubernetes Secret
         run: |
-          kubectl create secret generic app-secrets \
+          kubectl create secret generic upload-secrets \
             --from-literal=AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
             --from-literal=AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             --from-literal=POSTGRES_URL="${{ secrets.METADATA_POSTGRES_URL }}" \
