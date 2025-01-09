@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"soundscape/services/upload/internal"
 	"soundscape/shared"
+	"soundscape/shared/metadatadb"
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -43,7 +44,7 @@ func main() {
 		}))
 
 		db := connect(config)
-		internal.AutoMigrate(db)
+		metadatadb.AutoMigrate(db)
 
 		registerHealthCheck(router, db)
 		registerApi(router, db, config)

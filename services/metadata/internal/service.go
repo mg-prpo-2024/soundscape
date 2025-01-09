@@ -2,7 +2,6 @@ package internal
 
 import (
 	"soundscape/services/metadata/internal/dtos"
-	"time"
 )
 
 type Service interface {
@@ -48,7 +47,7 @@ func (s *service) GetArtistAlbums(artistId string) ([]*dtos.Album, error) {
 		albumDtos = append(albumDtos, &dtos.Album{
 			Id:        album.ID.String(),
 			Title:     album.Title,
-			CreatedAt: album.CreatedAt.Format(time.RFC3339),
+			CreatedAt: album.CreatedAt,
 		})
 	}
 	return albumDtos, nil

@@ -55,7 +55,7 @@ func (s *service) GetArtistAlbums(artistId string) ([]*AlbumDto, error) {
 		albumDtos = append(albumDtos, &AlbumDto{
 			Id:        album.ID.String(),
 			Title:     album.Title,
-			CreatedAt: album.CreatedAt.Format(time.RFC3339),
+			CreatedAt: album.CreatedAt,
 		})
 	}
 	return albumDtos, nil
