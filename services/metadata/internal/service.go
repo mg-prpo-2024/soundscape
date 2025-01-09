@@ -1,18 +1,15 @@
 package internal
 
 import (
+	"soundscape/services/metadata/internal/dtos"
 	"time"
 )
 
 type Service interface {
-	CreateArtist(artist CreateArtistDto) error
-	GetArtist(userId string) (*ArtistDto, error)
-	GetArtistAlbums(artistId string) ([]*AlbumDto, error)
-	CreateAlbum(album CreateAlbumDto) (*AlbumDto, error)
-	GetAlbum(id string) (*AlbumDto, error)
-	CreateSong(song CreateSongDto) (*CreateSongResponseDto, error)
-	GetAlbumSongs(id string) ([]*SongDto, error)
-	DeleteSong(id string) error
+	GetArtist(userId string) (*dtos.Artist, error)
+	GetArtistAlbums(artistId string) ([]*dtos.Album, error)
+	GetAlbum(id string) (*dtos.Album, error)
+	GetAlbumSongs(id string) ([]*dtos.Song, error)
 }
 
 type service struct {
@@ -26,18 +23,14 @@ func NewService(repo Repository, storage Storage) *service {
 	return &service{repo: repo, storage: storage}
 }
 
-func (s *service) CreateArtist(artist CreateArtistDto) error {
-	return s.repo.CreateArtist(artist)
-}
-
-func (s *service) GetArtist(userId string) (*ArtistDto, error) {
+func (s *service) GetArtist(userId string) (*dtos.Artist, error) {
 	artist, err := s.repo.GetArtist(userId)
 	if err != nil {
 		return nil, err
 	}
-	return &ArtistDto{
+	return &dtos.Artist{
 		Id: artist.ID.String(),
-		CreateArtistDto: CreateArtistDto{
+		CreateArtist: dtos.CreateArtist{
 			UserId: artist.UserId,
 			Name:   artist.Name,
 			Bio:    artist.Bio,
@@ -45,14 +38,14 @@ func (s *service) GetArtist(userId string) (*ArtistDto, error) {
 	}, nil
 }
 
-func (s *service) GetArtistAlbums(artistId string) ([]*AlbumDto, error) {
+func (s *service) GetArtistAlbums(artistId string) ([]*dtos.Album, error) {
 	albums, err := s.repo.GetArtistAlbums(artistId)
 	if err != nil {
 		return nil, err
 	}
-	albumDtos := []*AlbumDto{}
+	albumDtos := []*dtos.Album{}
 	for _, album := range albums {
-		albumDtos = append(albumDtos, &AlbumDto{
+		albumDtos = append(albumDtos, &dtos.Album{
 			Id:        album.ID.String(),
 			Title:     album.Title,
 			CreatedAt: album.CreatedAt.Format(time.RFC3339),
@@ -61,64 +54,28 @@ func (s *service) GetArtistAlbums(artistId string) ([]*AlbumDto, error) {
 	return albumDtos, nil
 }
 
-func (s *service) CreateAlbum(albumDto CreateAlbumDto) (*AlbumDto, error) {
-	album, err := s.repo.CreateAlbum(albumDto)
-	if err != nil {
-		return nil, err
-	}
-	return &AlbumDto{
-		Id:    album.ID.String(),
-		Title: album.Title,
-	}, err
-}
-
-func (s *service) GetAlbum(id string) (*AlbumDto, error) {
+func (s *service) GetAlbum(id string) (*dtos.Album, error) {
 	album, err := s.repo.GetAlbum(id)
 	if err != nil {
 		return nil, err
 	}
-	return &AlbumDto{
+	return &dtos.Album{
 		Id:    album.ID.String(),
 		Title: album.Title,
 	}, nil
 }
 
-func (s *service) CreateSong(songDto CreateSongDto) (*CreateSongResponseDto, error) {
-	song, err := s.repo.CreateSong(songDto)
-	if err != nil {
-		return nil, err
-	}
-	id := song.ID.String()
-	presignedUrl, err := s.storage.GeneratePresignedURL(id, 5*time.Hour)
-	if err != nil {
-		return nil, err
-	}
-	return &CreateSongResponseDto{
-		Id:       id,
-		UpoadUrl: presignedUrl,
-	}, nil
-}
-
-func (s *service) GetAlbumSongs(albumId string) ([]*SongDto, error) {
+func (s *service) GetAlbumSongs(albumId string) ([]*dtos.Song, error) {
 	songs, err := s.repo.GetAlbumSongs(albumId)
 	if err != nil {
 		return nil, err
 	}
-	songDtos := []*SongDto{}
+	songDtos := []*dtos.Song{}
 	for _, song := range songs {
-		songDtos = append(songDtos, &SongDto{
+		songDtos = append(songDtos, &dtos.Song{
 			Id:    song.ID.String(),
 			Title: song.Title,
 		})
 	}
 	return songDtos, nil
-}
-
-func (s *service) DeleteSong(id string) error {
-	// TODO: this should be transactional
-	err := s.storage.DeleteFile(id)
-	if err != nil {
-		return err
-	}
-	return s.repo.DeleteSong(id)
 }
