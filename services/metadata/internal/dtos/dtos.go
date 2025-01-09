@@ -2,15 +2,11 @@ package dtos
 
 import "time"
 
-type CreateArtist struct {
+type Artist struct {
+	Id     string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Artist ID"`
 	UserId string `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"User ID"`
 	Name   string `json:"name" example:"The Weeknd" doc:"User email"`
 	Bio    string `json:"bio" example:"The Weeknd took over pop music & culture on his own terms ..." doc:"Artist's biographical information and background"`
-}
-
-type Artist struct {
-	Id string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Artist ID"`
-	CreateArtist
 }
 
 type Album struct {

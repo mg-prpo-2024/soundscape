@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"soundscape/services/metadata/internal"
+	"soundscape/services/metadata/internal/albums"
+	"soundscape/services/metadata/internal/artists"
 	"soundscape/shared"
 	"soundscape/shared/metadatadb"
 	"time"
@@ -108,7 +110,7 @@ func registerHealthCheck(router chi.Router, db *gorm.DB) {
 
 func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	config := huma.DefaultConfig("Metadata API", "1.0.0")
-	config.Info.Description = "API for artist, album, song metadata."
+	config.Info.Description = "API for getting artist, album, song metadata."
 	config.Servers = append(config.Servers,
 		&huma.Server{URL: "http://4.182.133.97", Description: "Production"}, // TODO: update url
 	)
@@ -132,5 +134,6 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 
 	api := humachi.New(router, config)
 	api.UseMiddleware(shared.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
-	internal.Register(api, db, appConfig)
+	artists.Register(api, db)
+	albums.Register(api, db)
 }

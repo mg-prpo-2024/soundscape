@@ -1,4 +1,4 @@
-package internal
+package artists
 
 import (
 	"soundscape/shared/metadatadb"
@@ -9,8 +9,6 @@ import (
 type Repository interface {
 	GetArtist(userId string) (*metadatadb.Artist, error)
 	GetArtistAlbums(artistId string) ([]*metadatadb.Album, error)
-	GetAlbum(id string) (*metadatadb.Album, error)
-	GetAlbumSongs(albumId string) ([]*metadatadb.Song, error)
 }
 
 type repository struct {
@@ -33,16 +31,4 @@ func (r *repository) GetArtistAlbums(artistId string) ([]*metadatadb.Album, erro
 	var albums []*metadatadb.Album
 	err := r.db.Where("artist_id = ?", artistId).Find(&albums).Error
 	return albums, err
-}
-
-func (r *repository) GetAlbum(id string) (*metadatadb.Album, error) {
-	album := &metadatadb.Album{}
-	err := r.db.Where("id = ?", id).First(&album).Error
-	return album, err
-}
-
-func (r *repository) GetAlbumSongs(albumId string) ([]*metadatadb.Song, error) {
-	var songs []*metadatadb.Song
-	err := r.db.Where("album_id = ?", albumId).Find(&songs).Error
-	return songs, err
 }
