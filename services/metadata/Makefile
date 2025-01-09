@@ -11,38 +11,10 @@ build:
 run:
 	@go run cmd/main.go
 
-stripe-webhook-forward:
-	@stripe listen --forward-to localhost:8888/stripe-webhook
-
-# TODO: fix
-docker-run:
-	@if docker compose up 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose up; \
-	fi
-
-# TODO: fix
-docker-down:
-	@if docker compose down 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose down; \
-	fi
-
-
 # Test the application
 test:
 	@echo "Testing..."
 	@go test ./... -v
-
-
-# Integrations Tests for the application
-itest:
-	@echo "Running integration tests..."
-	@go test ./internal/database -v
 
 
 # Clean the binary

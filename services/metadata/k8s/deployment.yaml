@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metadata-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: metadata-service
+  template:
+    metadata:
+      labels:
+        app: metadata-service
+    spec:
+      containers:
+        - name: metadata-service
+          image: markogartnar/soundscape-metadata:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: AUTH0_DOMAIN
+            - name: SERVICE_AUTH0_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: AUTH0_AUDIENCE
+            - name: SERVICE_POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: POSTGRES_URL
+            - name: SERVICE_AZURE_ACCOUNT_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: AZURE_ACCOUNT_NAME
+            - name: SERVICE_AZURE_ACCOUNT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: AZURE_ACCOUNT_KEY
+            - name: SERVICE_AZURE_CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: metadata-secrets
+                  key: AZURE_CONTAINER_NAME
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -11,35 +11,12 @@ build:
 run:
 	@go run cmd/main.go
 
-# TODO: fix
-docker-run:
-	@if docker compose up 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose up; \
-	fi
-
-# TODO: fix
-docker-down:
-	@if docker compose down 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose down; \
-	fi
 
 
 # Test the application
 test:
 	@echo "Testing..."
 	@go test ./... -v
-
-
-# Integrations Tests for the application
-itest:
-	@echo "Running integration tests..."
-	@go test ./internal/database -v
 
 
 # Clean the binary
@@ -64,8 +41,5 @@ watch:
                 exit 1; \
             fi; \
         fi
-
-sqlc:
-	@sqlc generate
 
 .PHONY: all build run test clean watch
