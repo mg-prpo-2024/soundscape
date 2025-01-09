@@ -17,7 +17,7 @@ spec:
           image: markogartnar/soundscape-metadata:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 8000
           env:
             - name: SERVICE_AUTH0_DOMAIN
               valueFrom:
@@ -52,12 +52,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /livez
-              port: 8080
+              port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /readyz
-              port: 8080
+              port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10

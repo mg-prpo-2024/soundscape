@@ -14,5 +14,5 @@ FROM alpine:latest
 
 ENV SERVICE_APP_ENV=production
 COPY --from=builder /app/services/metadata/main /usr/local/bin/
-EXPOSE 8080
+EXPOSE 8000
 CMD ["main"]
