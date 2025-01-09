@@ -13,8 +13,35 @@ func Register(api huma.API, db *gorm.DB) {
 	service := NewService(
 		NewRepository(db),
 	)
+	registerGetAlbums(api, service)
 	registerGetAlbum(api, service)
 	registerGetSongs(api, service)
+}
+
+type GetAlbumsOutput struct {
+	Body []*dtos.Album
+}
+
+func registerGetAlbums(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-albums",
+		Method:      http.MethodGet,
+		Path:        "/albums",
+		Summary:     "Get albums",
+		Description: "Get albums.",
+		Tags:        []string{"Albums"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *struct{}) (*GetAlbumsOutput, error) {
+		albums, err := service.GetAlbums()
+		if err != nil {
+			return nil, err
+		}
+		return &GetAlbumsOutput{
+			Body: albums,
+		}, nil
+	})
 }
 
 type GetAlbumInput struct {

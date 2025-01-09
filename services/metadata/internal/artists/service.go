@@ -24,10 +24,9 @@ func (s *service) GetArtist(userId string) (*dtos.Artist, error) {
 		return nil, err
 	}
 	return &dtos.Artist{
-		Id:     artist.ID.String(),
-		UserId: artist.UserId,
-		Name:   artist.Name,
-		Bio:    artist.Bio,
+		Id:   artist.ID.String(),
+		Name: artist.Name,
+		Bio:  artist.Bio,
 	}, nil
 }
 

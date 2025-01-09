@@ -43,6 +43,7 @@ type Album struct {
 	Title    string
 	Songs    []Song
 	ArtistId uuid.UUID
+	Artist   Artist
 }
 
 // type Genre struct {

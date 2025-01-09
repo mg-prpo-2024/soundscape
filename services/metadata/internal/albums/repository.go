@@ -7,6 +7,7 @@ import (
 )
 
 type Repository interface {
+	GetAlbums() ([]*metadatadb.Album, error)
 	GetAlbum(id string) (*metadatadb.Album, error)
 	GetAlbumSongs(albumId string) ([]*metadatadb.Song, error)
 }
@@ -21,9 +22,15 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db: db}
 }
 
+func (r *repository) GetAlbums() ([]*metadatadb.Album, error) {
+	albums := []*metadatadb.Album{}
+	err := r.db.Model(&metadatadb.Album{}).Preload("Artist").Limit(10).Find(&albums).Error
+	return albums, err
+}
+
 func (r *repository) GetAlbum(id string) (*metadatadb.Album, error) {
 	album := &metadatadb.Album{}
-	err := r.db.Where("id = ?", id).First(&album).Error
+	err := r.db.Model(&metadatadb.Album{}).Preload("Artist").Where("id = ?", id).First(&album).Error
 	return album, err
 }
 
