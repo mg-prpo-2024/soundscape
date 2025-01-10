@@ -1,0 +1,87 @@
+name: Publish & Deploy Favorites Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/favorites/**"
+      - "shared/**"
+  # TODO: remove/comment out this
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "services/favorites/**"
+      - "shared/**"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./services/favorites/Dockerfile
+          push: true
+          tags: markogartnar/soundscape-favorites:latest
+
+  deploy-to-aks:
+    runs-on: ubuntu-latest
+    needs: build-and-push # Wait for the image build job to finish
+
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "latest"
+
+      # Authenticate to Azure
+      - name: Authenticate to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Configure kubectl to use AKS
+      - name: Configure kubectl
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
+            --name ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Create Kubernetes Secret
+        run: |
+          kubectl create secret generic favorites-secrets \
+            --from-literal=AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
+            --from-literal=AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
+            --from-literal=POSTGRES_URL="${{ secrets.METADATA_POSTGRES_URL }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+      # Deploy to AKS
+      - name: Apply Kubernetes manifests
+        working-directory: ./services/favorites
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/public-svc.yaml  # Ensure LoadBalancer is created
+          kubectl rollout restart deployment favorites-service
+
+      - name: Confirm Deployment
+        run: |
+          kubectl rollout status deployment/favorites-service --timeout=60s
