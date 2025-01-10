@@ -110,7 +110,7 @@ func registerHealthCheck(router chi.Router, db *gorm.DB) {
 
 func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	config := huma.DefaultConfig("Metadata API", "1.0.0")
-	config.Info.Description = "API for getting artist, album, song metadata."
+	config.Info.Description = "API for fetching artist, album, song metadata."
 	config.Servers = append(config.Servers,
 		&huma.Server{URL: "http://4.182.133.97", Description: "Production"}, // TODO: update url
 	)
