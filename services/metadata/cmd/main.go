@@ -112,7 +112,7 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	config := huma.DefaultConfig("Metadata API", "1.0.0")
 	config.Info.Description = "API for fetching artist, album, song metadata."
 	config.Servers = append(config.Servers,
-		&huma.Server{URL: "http://4.182.133.97", Description: "Production"}, // TODO: update url
+		&huma.Server{URL: "http://72.144.120.236", Description: "Production"}, // TODO: update url
 	)
 	config.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"auth0": {
