@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"soundscape/services/favorites/internal"
+	"soundscape/services/favorites/internal/models"
 	"soundscape/services/favorites/internal/playlists"
 	"soundscape/shared"
-	"soundscape/shared/metadatadb"
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -45,7 +45,7 @@ func main() {
 		}))
 
 		db := connect(config)
-		metadatadb.AutoMigrate(db)
+		models.AutoMigrate(db)
 
 		registerHealthCheck(router, db)
 		registerApi(router, db, config)
