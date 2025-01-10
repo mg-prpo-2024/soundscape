@@ -13,6 +13,8 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
+type TokenKey struct{}
+
 // NewJWKSet creates an auto-refreshing key set to validate JWT signatures.
 func NewJWKSet(jwkUrl string) jwk.Set {
 	jwkCache := jwk.NewCache(context.Background())
@@ -71,6 +73,8 @@ func NewAuthMiddleware(api huma.API, auth0Domain string, auth0Audience string) f
 			jwt.WithIssuer(issuerUrl),
 			jwt.WithAudience(auth0Audience),
 		)
+		ctx = huma.WithValue(ctx, TokenKey{}, parsed)
+
 		if err != nil {
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Unauthorized")
 			return
