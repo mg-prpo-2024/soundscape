@@ -19,3 +19,8 @@ type Song struct {
 	Id    string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Song ID"`
 	Title string `json:"title" example:"Blinding Lights" doc:"Song title"`
 }
+
+type SongFull struct {
+	Id    string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Song ID"`
+	Title string `json:"title" example:"Blinding Lights" doc:"Song title"`
+}
