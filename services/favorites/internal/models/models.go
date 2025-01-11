@@ -7,14 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type Base struct {
-	ID        uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	CreatedAt time.Time // Automatically managed by GORM for creation time
-	UpdatedAt time.Time // Automatically managed by GORM for update time
-}
-
 type Playlist struct {
-	Base
+	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	UserId string
 	Name   string
 	Public bool
@@ -22,8 +16,10 @@ type Playlist struct {
 }
 
 type Song struct {
-	Base
-	PlaylistID uuid.UUID `gorm:"primaryKey;"`
+	ID         uuid.UUID `gorm:"primaryKey;type:uuid"`
+	PlaylistID uuid.UUID `gorm:"primaryKey"`
+	CreatedAt  time.Time // Automatically managed by GORM for creation time
+	UpdatedAt  time.Time // Automatically managed by GORM for update time
 }
 
 type LikedSong struct {
