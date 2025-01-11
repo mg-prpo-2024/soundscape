@@ -23,13 +23,13 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 	// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=checkout#test
 	registerCreateSubscription(api, service, config)
 	registerStripeHook(api, service)
-	// registerGetPayments(api, service)
-	// registerGetCustomer(api, service)
+	registerGetCustomer(api, service)
+	registerGetPayments(api, service)
 }
 
 type CreateUserInput struct {
 	Secret string `header:"X-Auth0-Webhook-Secret" doc:"Auth0 Webhook Secret"`
-	Body   UserDto
+	Body   CreateUserDto
 }
 
 type CreateUserOutput struct{}
@@ -204,4 +204,58 @@ func PrettyPrint(v interface{}) {
 		return
 	}
 	logrus.Println(string(prettyJSON))
+}
+
+type GetCustomerInput struct {
+	Id string `path:"id" doc:"User ID" example:"2abe81c8-5b1a-4625-904b-ef4a8594de4c"`
+}
+type GetCustomerOutput struct {
+	Body *stripe.Customer
+}
+
+func registerGetCustomer(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-user-customer",
+		Method:      http.MethodGet,
+		Path:        "/users/{id}/customer",
+		Summary:     "Get stripe customer object for a user",
+		Description: "Get stripe customer object for a user by stripe customer id.",
+		Tags:        []string{"Users"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *GetCustomerInput) (*GetCustomerOutput, error) {
+		user, err := service.GetCustomer(input.Id)
+		if err != nil {
+			return nil, err
+		}
+		return &GetCustomerOutput{Body: user}, nil
+	})
+}
+
+type GetPaymentsInput struct {
+	Id string `path:"id" doc:"User ID" example:"2abe81c8-5b1a-4625-904b-ef4a8594de4c"`
+}
+type GetPaymentsOutput struct {
+	Body []*stripe.PaymentIntent
+}
+
+func registerGetPayments(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-user-payments",
+		Method:      http.MethodGet,
+		Path:        "/users/{id}/payments",
+		Summary:     "Get stripe payments for a user",
+		Description: "Get stripe payments for a user.",
+		Tags:        []string{"Users"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *GetPaymentsInput) (*GetPaymentsOutput, error) {
+		payments, err := service.GetPayments(input.Id)
+		if err != nil {
+			return nil, err
+		}
+		return &GetPaymentsOutput{Body: payments}, nil
+	})
 }
