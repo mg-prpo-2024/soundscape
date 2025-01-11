@@ -24,7 +24,7 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 	registerCreateSubscription(api, service, config)
 	registerStripeHook(api, service)
 	registerGetCustomer(api, service)
-	// registerGetPayments(api, service)
+	registerGetPayments(api, service)
 }
 
 type CreateUserInput struct {
@@ -230,5 +230,32 @@ func registerGetCustomer(api huma.API, service Service) {
 			return nil, err
 		}
 		return &GetCustomerOutput{Body: user}, nil
+	})
+}
+
+type GetPaymentsInput struct {
+	Id string `path:"id" doc:"User ID" example:"2abe81c8-5b1a-4625-904b-ef4a8594de4c"`
+}
+type GetPaymentsOutput struct {
+	Body []*stripe.PaymentIntent
+}
+
+func registerGetPayments(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "get-user-payments",
+		Method:      http.MethodGet,
+		Path:        "/users/{id}/payments",
+		Summary:     "Get stripe payments for a user",
+		Description: "Get stripe payments for a user.",
+		Tags:        []string{"Users"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *GetPaymentsInput) (*GetPaymentsOutput, error) {
+		payments, err := service.GetPayments(input.Id)
+		if err != nil {
+			return nil, err
+		}
+		return &GetPaymentsOutput{Body: payments}, nil
 	})
 }

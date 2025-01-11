@@ -74,6 +74,7 @@ jobs:
             --from-literal=AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             --from-literal=POSTGRES_URL="${{ secrets.METADATA_POSTGRES_URL }}" \
             --dry-run=client -o yaml | kubectl apply -f -
+        # TODO: fix METADATA_POSTGRES_URL -> FAVORITES_POSTGRES_URL
       # Deploy to AKS
       - name: Apply Kubernetes manifests
         working-directory: ./services/favorites

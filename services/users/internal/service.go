@@ -4,6 +4,7 @@ import (
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/checkout/session"
 	"github.com/stripe/stripe-go/v81/customer"
+	"github.com/stripe/stripe-go/v81/paymentintent"
 )
 
 type Service interface {
@@ -12,6 +13,7 @@ type Service interface {
 	CreateSubscription(priceId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
 	ProvisionSubscription(session *stripe.CheckoutSession) error
 	GetCustomer(id string) (*stripe.Customer, error)
+	GetPayments(id string) ([]*stripe.PaymentIntent, error)
 }
 
 type service struct {
@@ -66,4 +68,23 @@ func (s *service) GetCustomer(userId string) (*stripe.Customer, error) {
 	params := &stripe.CustomerParams{}
 	result, err := customer.Get(*user.StripeCustomerId, params)
 	return result, err
+}
+
+func (s *service) GetPayments(userId string) ([]*stripe.PaymentIntent, error) {
+	user, err := s.repo.GetUser(userId)
+	if err != nil {
+		return nil, err
+	}
+	params := &stripe.PaymentIntentListParams{
+		Customer: stripe.String(*user.StripeCustomerId),
+	}
+
+	i := paymentintent.List(params)
+
+	var payments []*stripe.PaymentIntent
+	for i.Next() {
+		payments = append(payments, i.PaymentIntent())
+	}
+
+	return payments, i.Err()
 }
