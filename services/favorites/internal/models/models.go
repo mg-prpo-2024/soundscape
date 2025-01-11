@@ -26,8 +26,15 @@ type Song struct {
 	PlaylistID uuid.UUID `gorm:"primaryKey;"`
 }
 
+type LikedSong struct {
+	ID        uuid.UUID `gorm:"primaryKey;type:uuid"`
+	UserId    string    `gorm:"primaryKey"`
+	CreatedAt time.Time // Automatically managed by GORM for creation time
+	UpdatedAt time.Time // Automatically managed by GORM for update time
+}
+
 func AutoMigrate(db *gorm.DB) {
-	err := db.AutoMigrate(&Playlist{}, &Song{})
+	err := db.AutoMigrate(&Playlist{}, &Song{}, &LikedSong{})
 	if err != nil {
 		panic(err)
 	}
