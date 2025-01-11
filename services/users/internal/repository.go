@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	CreateUser(user UserDto) error
+	CreateUser(user CreateUserDto) error
 	GetUser(id string) (*UserDto, error)
 	SetCustomerId(auth0Id string, customerId string) error
 }
@@ -22,7 +22,7 @@ func NewRepository(db *gorm.DB) *repository {
 	return &repository{db: db}
 }
 
-func (r *repository) CreateUser(userDto UserDto) error {
+func (r *repository) CreateUser(userDto CreateUserDto) error {
 	user := User{
 		Auth0Id:          userDto.Id,
 		Email:            userDto.Email,
@@ -34,12 +34,13 @@ func (r *repository) CreateUser(userDto UserDto) error {
 
 func (r *repository) GetUser(id string) (*UserDto, error) {
 	user := User{}
-	result := r.db.First(&user, "id = ?", id)
+	result := r.db.First(&user, "auth0_id = ?", id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return &UserDto{
-		Id:               user.Auth0Id,
+		Id:               user.ID.String(),
+		Auth0Id:          user.Auth0Id,
 		Email:            user.Email,
 		StripeCustomerId: &user.StripeCustomerId.String,
 	}, nil

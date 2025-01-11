@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	CreateUser(user UserDto) error
+	CreateUser(user CreateUserDto) error
 	GetUser(id string) (*UserDto, error)
 	CreateSubscription(priceId, userId, successUrl, cancelUrl string) (*stripe.CheckoutSession, error)
 	ProvisionSubscription(session *stripe.CheckoutSession) error
@@ -22,7 +22,7 @@ func NewService(repo Repository) *service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateUser(user UserDto) error {
+func (s *service) CreateUser(user CreateUserDto) error {
 	return s.repo.CreateUser(user)
 }
 

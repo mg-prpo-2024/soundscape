@@ -29,7 +29,7 @@ func Register(api huma.API, db *gorm.DB, config *Config) {
 
 type CreateUserInput struct {
 	Secret string `header:"X-Auth0-Webhook-Secret" doc:"Auth0 Webhook Secret"`
-	Body   UserDto
+	Body   CreateUserDto
 }
 
 type CreateUserOutput struct{}
