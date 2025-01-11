@@ -49,10 +49,9 @@ func (s *service) GetLikedSongs(token, userId string) ([]*dtos.Song, error) {
 }
 
 func (s *service) LikeSong(userId string, songId string) error {
-	s.repo.LikeSong(userId, songId)
-	return nil
+	return s.repo.LikeSong(userId, songId)
 }
 
 func (s *service) UnlikeSong(userId string, songId string) error {
-	return nil
+	return s.repo.UnlikeSong(userId, songId)
 }

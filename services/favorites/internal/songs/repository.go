@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	GetLikedSongs(userId string) ([]*models.LikedSong, error)
 	LikeSong(userId, songId string) error
+	UnlikeSong(userId, songId string) error
 }
 
 type repository struct {
@@ -30,4 +31,8 @@ func (r *repository) GetLikedSongs(userId string) ([]*models.LikedSong, error) {
 
 func (r *repository) LikeSong(userId, songId string) error {
 	return r.db.Create(&models.LikedSong{ID: uuid.MustParse(songId), UserId: userId}).Error
+}
+
+func (r *repository) UnlikeSong(userId, songId string) error {
+	return r.db.Delete(&models.LikedSong{ID: uuid.MustParse(songId), UserId: userId}).Error
 }

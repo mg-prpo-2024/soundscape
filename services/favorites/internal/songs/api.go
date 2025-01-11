@@ -19,6 +19,7 @@ func Register(api huma.API, db *gorm.DB) {
 	)
 	registerGetSongs(api, service)
 	registerLikeSong(api, service)
+	registerUnlikeSong(api, service)
 }
 
 type GetLikedSongsInput struct {
@@ -52,7 +53,7 @@ func registerGetSongs(api huma.API, service Service) {
 }
 
 type LikeSongInput struct {
-	SongID string `path:"songId" example:"" doc:"Song ID"`
+	SongID string `path:"songId" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Song ID"`
 }
 type LikeSongOutput struct {
 }
@@ -75,5 +76,32 @@ func registerLikeSong(api huma.API, service Service) {
 			return nil, err
 		}
 		return &LikeSongOutput{}, nil
+	})
+}
+
+type UnlikeSongInput struct {
+	SongID string `path:"songId" example:"123e4567-e89b-12d3-a456-426614174000" doc:"Song ID"`
+}
+type UnlikeSongOutput struct {
+}
+
+func registerUnlikeSong(api huma.API, service Service) {
+	huma.Register(api, huma.Operation{
+		OperationID: "unlike-song",
+		Method:      http.MethodDelete,
+		Path:        "/songs/{songId}",
+		Summary:     "Unlike a song",
+		Description: "Unlike a song.",
+		Tags:        []string{"Songs"},
+		Security: []map[string][]string{
+			{"auth0": {"openid"}},
+		},
+	}, func(ctx context.Context, input *UnlikeSongInput) (*UnlikeSongOutput, error) {
+		userId := ctx.Value(shared.TokenKey{}).(jwt.Token).Subject()
+		err := service.UnlikeSong(userId, input.SongID)
+		if err != nil {
+			return nil, err
+		}
+		return &UnlikeSongOutput{}, nil
 	})
 }
