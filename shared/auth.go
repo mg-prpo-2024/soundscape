@@ -14,6 +14,7 @@ import (
 )
 
 type TokenKey struct{}
+type RawTokenKey struct{}
 
 // NewJWKSet creates an auto-refreshing key set to validate JWT signatures.
 func NewJWKSet(jwkUrl string) jwk.Set {
@@ -74,6 +75,7 @@ func NewAuthMiddleware(api huma.API, auth0Domain string, auth0Audience string) f
 			jwt.WithAudience(auth0Audience),
 		)
 		ctx = huma.WithValue(ctx, TokenKey{}, parsed)
+		ctx = huma.WithValue(ctx, RawTokenKey{}, token)
 
 		if err != nil {
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Unauthorized")
