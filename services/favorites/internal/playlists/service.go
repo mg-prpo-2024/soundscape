@@ -57,10 +57,10 @@ func (s *service) GetPlaylists(userId string) ([]*dtos.Playlist, error) {
 
 func (s *service) GetPlaylist(token, userId, playlistId string) (*dtos.PlaylistFull, error) {
 	playlist, err := s.repo.GetPlaylist(userId, playlistId)
-	logrus.Println("playlist", playlist)
 	if err != nil {
 		return nil, err
 	}
+	logrus.Println("playlist", playlist)
 	songIds := []string{}
 	for _, song := range playlist.Songs {
 		songIds = append(songIds, song.ID.String())

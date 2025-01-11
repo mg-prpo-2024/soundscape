@@ -143,6 +143,7 @@ func registerCreatePlaylistSong(api huma.API, service Service) {
 			if errors.Is(err, apierrors.ErrForbidden) {
 				return nil, huma.Error403Forbidden("Unauthorized")
 			}
+			return nil, err
 		}
 		return nil, nil
 	})

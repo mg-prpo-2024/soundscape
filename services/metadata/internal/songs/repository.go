@@ -23,5 +23,16 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) GetSongs(songIds []string) ([]*metadatadb.Song, error) {
 	var songs []*metadatadb.Song
 	err := r.db.Where("id in (?)", songIds).Find(&songs).Error
-	return songs, err
+	// Sort songs to match input order
+	songMap := make(map[string]*metadatadb.Song)
+	for _, song := range songs {
+		songMap[song.ID.String()] = song
+	}
+	sortedSongs := make([]*metadatadb.Song, 0, len(songIds))
+	for _, id := range songIds {
+		if song, ok := songMap[id]; ok {
+			sortedSongs = append(sortedSongs, song)
+		}
+	}
+	return sortedSongs, err
 }

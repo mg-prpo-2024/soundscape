@@ -12,8 +12,9 @@ type Playlist struct {
 }
 
 type Song struct {
-	Id    string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Song ID"`
-	Title string `json:"title" example:"Alone Again" doc:"Song name"`
+	Id        string `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Song ID"`
+	Title     string `json:"title" example:"Alone Again" doc:"Song name"`
+	CreatedAt string `json:"created_at" example:"2021-01-01T00:00:00Z" doc:"Date the song was liked"`
 }
 type PlaylistFull struct {
 	Id     string  `json:"id" example:"550e8400-e29b-41d4-a716-446655440000" doc:"Artist ID"`

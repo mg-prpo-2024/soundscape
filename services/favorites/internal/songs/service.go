@@ -3,12 +3,15 @@ package songs
 import (
 	"soundscape/services/favorites/internal"
 	"soundscape/services/favorites/internal/dtos"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Service interface {
 	GetLikedSongs(token, userId string) ([]*dtos.Song, error)
 	LikeSong(userId string, songId string) error
 	UnlikeSong(userId string, songId string) error
+	CheckSongs(userId string, songIds []string) ([]bool, error)
 }
 
 type service struct {
@@ -39,10 +42,12 @@ func (s *service) GetLikedSongs(token, userId string) ([]*dtos.Song, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, song := range songsFull {
+	for i, song := range songsFull {
+		logrus.Println(song.Title, songs[i].CreatedAt)
 		songDtos = append(songDtos, &dtos.Song{
-			Id:    song.ID,
-			Title: song.Title,
+			Id:        song.ID,
+			Title:     song.Title,
+			CreatedAt: songs[i].CreatedAt.String(),
 		})
 	}
 	return songDtos, nil
@@ -54,4 +59,8 @@ func (s *service) LikeSong(userId string, songId string) error {
 
 func (s *service) UnlikeSong(userId string, songId string) error {
 	return s.repo.UnlikeSong(userId, songId)
+}
+
+func (s *service) CheckSongs(userId string, songIds []string) ([]bool, error) {
+	return s.repo.CheckSongs(userId, songIds)
 }
