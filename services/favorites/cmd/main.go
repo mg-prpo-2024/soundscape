@@ -7,6 +7,7 @@ import (
 	"soundscape/services/favorites/internal"
 	"soundscape/services/favorites/internal/models"
 	"soundscape/services/favorites/internal/playlists"
+	"soundscape/services/favorites/internal/songs"
 	"soundscape/shared"
 	"time"
 
@@ -134,4 +135,5 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	api := humachi.New(router, config)
 	api.UseMiddleware(shared.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
 	playlists.Register(api, db)
+	songs.Register(api, db)
 }

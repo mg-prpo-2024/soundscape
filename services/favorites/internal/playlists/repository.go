@@ -44,13 +44,13 @@ func (r *repository) GetPlaylists(userId string) ([]*models.Playlist, error) {
 }
 
 func (r *repository) GetPlaylist(userId, playlistId string) (*models.Playlist, error) {
-	playlist := &models.Playlist{Base: models.Base{ID: uuid.MustParse(playlistId)}}
+	playlist := &models.Playlist{ID: uuid.MustParse(playlistId)}
 	err := r.db.Model(&models.Playlist{}).Preload("Songs").First(playlist).Error
 	return playlist, err
 }
 
 func (r *repository) CreatePlaylistSong(userId, playlistId, songId string) error {
-	playlist := &models.Playlist{Base: models.Base{ID: uuid.MustParse(playlistId)}}
+	playlist := &models.Playlist{ID: uuid.MustParse(playlistId)}
 	err := r.db.First(playlist).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -63,14 +63,12 @@ func (r *repository) CreatePlaylistSong(userId, playlistId, songId string) error
 	}
 	return r.db.Create(&models.Song{
 		PlaylistID: uuid.MustParse(playlistId),
-		Base: models.Base{
-			ID: uuid.MustParse(songId),
-		},
+		ID:         uuid.MustParse(songId),
 	}).Error
 }
 
 func (r *repository) DeletePlaylistSong(userId, playlistId, songId string) error {
-	playlist := &models.Playlist{Base: models.Base{ID: uuid.MustParse(playlistId)}}
+	playlist := &models.Playlist{ID: uuid.MustParse(playlistId)}
 	err := r.db.First(playlist).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
