@@ -7,6 +7,7 @@ import (
 	"soundscape/services/metadata/internal"
 	"soundscape/services/metadata/internal/albums"
 	"soundscape/services/metadata/internal/artists"
+	"soundscape/services/metadata/internal/songs"
 	"soundscape/shared"
 	"soundscape/shared/metadatadb"
 	"time"
@@ -136,4 +137,5 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 	api.UseMiddleware(shared.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
 	artists.Register(api, db)
 	albums.Register(api, db)
+	songs.Register(api, db)
 }
