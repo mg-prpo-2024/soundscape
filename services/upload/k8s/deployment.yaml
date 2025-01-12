@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: upload-service
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: upload-service
@@ -16,6 +15,13 @@ spec:
         - name: upload-service
           image: markogartnar/soundscape-upload:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           ports:
             - containerPort: 8080
           env:
