@@ -134,6 +134,6 @@ func registerApi(router chi.Router, db *gorm.DB, appConfig *internal.Config) {
 
 	api := humachi.New(router, config)
 	api.UseMiddleware(shared.NewAuthMiddleware(api, appConfig.Auth0Domain, appConfig.Auth0Audience))
-	playlists.Register(api, db)
-	songs.Register(api, db)
+	playlists.Register(api, db, appConfig)
+	songs.Register(api, db, appConfig)
 }

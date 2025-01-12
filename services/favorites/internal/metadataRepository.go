@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -13,7 +14,8 @@ type MetadataRepository interface {
 }
 
 type metadataRepository struct {
-	client http.Client
+	client  http.Client
+	baseUrl string
 }
 
 type MetadataSong struct {
@@ -21,13 +23,14 @@ type MetadataSong struct {
 	Title string `json:"title"`
 }
 
-func NewMetadataRepository() *metadataRepository {
+func NewMetadataRepository(baseUrl string) *metadataRepository {
 	c := http.Client{Timeout: time.Duration(10) * time.Second}
-	return &metadataRepository{client: c}
+	return &metadataRepository{client: c, baseUrl: baseUrl}
 }
 
 func (r *metadataRepository) GetSongs(token string, songIds []string) ([]*MetadataSong, error) {
-	request, err := http.NewRequest("GET", "http://localhost:8000/songs?ids="+strings.Join(songIds, ","), nil)
+	url := fmt.Sprintf("%s/songs?ids=%s", r.baseUrl, strings.Join(songIds, ","))
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}

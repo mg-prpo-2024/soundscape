@@ -34,6 +34,11 @@ spec:
                 secretKeyRef:
                   name: favorites-secrets
                   key: POSTGRES_URL
+            - name: SERVICE_METADATA_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: favorites-secrets
+                  key: METADATA_SERVICE_URL
           livenessProbe:
             httpGet:
               path: /livez

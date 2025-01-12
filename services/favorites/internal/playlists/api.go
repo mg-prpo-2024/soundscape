@@ -15,10 +15,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func Register(api huma.API, db *gorm.DB) {
+func Register(api huma.API, db *gorm.DB, config *internal.Config) {
 	service := NewService(
 		NewRepository(db),
-		internal.NewMetadataRepository(),
+		internal.NewMetadataRepository(config.MetadataServiceUrl),
 	)
 	registerCreatePlaylist(api, service)
 	registerGetPlaylists(api, service)
