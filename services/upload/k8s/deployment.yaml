@@ -16,6 +16,13 @@ spec:
         - name: upload-service
           image: markogartnar/soundscape-upload:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           ports:
             - containerPort: 8080
           env:

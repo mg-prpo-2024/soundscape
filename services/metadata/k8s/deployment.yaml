@@ -16,6 +16,13 @@ spec:
         - name: metadata-service
           image: markogartnar/soundscape-metadata:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           ports:
             - containerPort: 8000
           env:
